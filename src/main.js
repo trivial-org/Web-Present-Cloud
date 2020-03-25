@@ -6,7 +6,9 @@ import router from './router'
 // 导入字体图标
 import './assets/font_aliIoT/iconfont.css'
 import './assets/fonts/iconfont.css'
-
+// 导入全局样式表
+import './assets/css/global.css'
+import axios from 'axios'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
@@ -20,7 +22,8 @@ Vue.use(ElementUI)
 //   return config
 // })
 // Vue.prototype.$http = axios
-
+axios.defaults.baseURL = ''
+Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
