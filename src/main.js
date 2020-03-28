@@ -6,6 +6,7 @@ import router from './router'
 // 导入字体图标
 import './assets/font_aliIoT/iconfont.css'
 import './assets/fonts/iconfont.css'
+import './assets/element-ui-font/iconfont.css'
 // 导入全局样式表
 import './assets/css/global.css'
 import axios from 'axios'

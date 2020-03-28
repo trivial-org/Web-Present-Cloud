@@ -7,10 +7,10 @@ export default {}
 </script>
 
 <style lang="less">
-  .main-div {
-    margin-top: 150px;
-      text-align: center;
+.main-div {
+  margin-top: 150px;
+  text-align: center;
   font-size: 55px;
   color: #8080ff;
-  }
+}
 </style>

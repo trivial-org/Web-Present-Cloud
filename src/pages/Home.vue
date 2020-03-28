@@ -3,20 +3,34 @@
     <!-- 头部区域 -->
     <el-header>
       <div class="img-adj">
-        <img src="../assets/logo.jpg" width="8.5%" height="8.5%" />
+        <img src="../assets/logo.jpg" width="7.5%" height="8.5%" />
         <span>到云后台管理系统</span>
       </div>
-      <el-button type="info" @click="logout">退出</el-button>
+      <el-button type="info" @click="logout" size="mini">退出</el-button>
     </el-header>
     <!-- 页面主体区域 -->
     <el-container>
       <!-- 侧边栏 -->
       <el-aside :width="isCollpse ? '64px' : '200px'">
-        <div class="toggle-button" @click="toggleCollapse">|||</div>
+        <div class="fold">
+          <i
+            class="iconfont icon-s-fold"
+            @click="toggleCollapse"
+            style="font-size:23px"
+            v-show="!isCollpse"
+          ></i>
+          <i
+            class="iconfont icon-s-unfold"
+            @click="toggleCollapse"
+            style="font-size:23px"
+            v-show="isCollpse"
+          ></i>
+        </div>
+
         <!-- 侧边栏菜单区域 -->
         <!--开启路由模式-->
         <el-menu
-          background-color="#333744"
+          background-color="#304156"
           text-color="#fff"
           active-text-color="#409EFF"
           :unique-opened="true"
@@ -196,13 +210,14 @@ export default {
 }
 
 .el-header {
-  background-color: #373d41;
+  background-color: #304156;
+  height: 50px;
   display: flex;
   justify-content: space-between;
   padding-left: 0;
   align-items: center;
   color: #fff;
-  font-size: 20px;
+  font-size: 17px;
   > div {
     display: flex;
     align-items: center;
@@ -210,30 +225,31 @@ export default {
       border-radius: 50%;
     }
     span {
-      margin-left: 15px;
+      margin-left: 13px;
     }
   }
 }
 
 .el-aside {
-  background-color: #333744;
+  background-color: #304156;
   .el-menu {
     border-right: none;
+  }
+  > div {
+    background-color: #4a5064;
+    line-height: 24px;
+    justify-content: center;
+    letter-spacing: 0.2em;
+    text-align: center;
+    > i {
+      color: #fff;
+      cursor: pointer;
+    }
   }
 }
 
 .el-main {
   background-color: #fff;
-}
-
-.toggle-button {
-  background-color: #4a5064;
-  font-size: 10;
-  line-height: 24px;
-  color: #ff8000;
-  text-align: center;
-  letter-spacing: 0.2em;
-  cursor: pointer;
 }
 
 .iconfont {
