@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import Home from 'pages/Home'
-import Login from 'pages/Login'
+import Home from 'pages/home'
+import Login from 'pages/login'
+
+import Welcome from '@/components/Welcome/welcome.vue'
+import Users from '@/components/Users/users.vue'
 
 Vue.use(Router)
 
@@ -15,12 +18,25 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
+      redirect: '/welcome',
+      children: [
+        {
+          name: 'welcome',
+          path: '/welcome',
+          component: Welcome
+        },
+        {
+          name: 'Users',
+          path: '/users-list',
+          component: Users
+        }
+      ]
     }
   ]
 })
 
-// 挂在路由导航守卫
+// 挂载路由导航守卫
 // router.beforeEach((to, from, next) => {
 //   // to 将要访问的路径
 //   // from 代表从哪个路径跳转而来
