@@ -66,6 +66,21 @@ const router = new Router({
           component: parameterSet
         }
       ]
+    },
+    {
+      path: '/404',
+      component: () => import('pages/error-page/404'),
+      hidden: true
+    },
+    {
+      path: '/403',
+      component: () => import('pages/error-page/403'),
+      hidden: true
+    },
+    {
+      path: '/500',
+      component: () => import('pages/error-page/500'),
+      hidden: true
     }
   ]
 })
