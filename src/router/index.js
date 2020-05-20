@@ -5,7 +5,13 @@ import Home from 'pages/home'
 import Login from 'pages/login'
 
 import Welcome from '@/components/Welcome/welcome.vue'
+import MenuManage from '@/components/MenuManage/menuManage.vue'
 import Users from '@/components/Users/users.vue'
+import Authority from '@/components/Authority/authority.vue'
+import dataDictionaryManage from '@/components/DataDictionary/dataDictionaryManage.vue'
+import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput'
+import parameterSet from '@/components/ParameterSet/parameterSet'
+import Role from '@/components/Roles/roles'
 
 Vue.use(Router)
 
@@ -25,11 +31,39 @@ const router = new Router({
           name: 'welcome',
           path: '/welcome',
           component: Welcome
+        }, {
+          name: 'MenuManage',
+          path: '/menus-list',
+          component: MenuManage
         },
         {
           name: 'Users',
           path: '/users-list',
           component: Users
+        }, {
+          name: 'Roles',
+          path: '/roles-list',
+          component: Role
+        },
+        {
+          name: 'Authority',
+          path: '/authority-list',
+          component: Authority
+        },
+        {
+          name: 'dataDictionaryManage',
+          path: '/data-dict-manage',
+          component: dataDictionaryManage
+        },
+        {
+          name: 'dataDictionaryInput',
+          path: '/data-dict-input',
+          component: dataDictionaryInput
+        },
+        {
+          name: 'parameterSet',
+          path: '/parameterSet',
+          component: parameterSet
         }
       ]
     }

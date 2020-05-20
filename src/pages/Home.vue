@@ -86,7 +86,7 @@ export default {
           authName: '菜单管理',
           path: 'menus',
           children: [
-            { id: 1011, authName: '课程列表', path: 'menus-list', children: [] }
+            { id: 1011, authName: '菜单列表', path: 'menus-list', children: [] }
           ]
         },
         {
@@ -100,7 +100,7 @@ export default {
         {
           id: 103,
           authName: '用户管理',
-          path: null,
+          path: 'users',
           children: [
             { id: 1031, authName: '用户列表', path: 'users-list', children: [] }
           ]
@@ -155,16 +155,35 @@ export default {
               children: []
             }
           ]
+        }, {
+          id: 107,
+          authName: '参数设置',
+          path: 'parameter-Set',
+          children: [
+            {
+              id: 1071,
+              authName: '参数设置',
+              path: 'parameterSet',
+              children: []
+            }
+          ]
+        }, {
+          id: 108,
+          authName: '组织管理',
+          path: 'organization-manage',
+          children: []
         }
       ],
       isCollpse: false,
       iconsObj: {
-        '101': 'iconfont icon-activity_fill',
-        '102': 'iconfont icon-yunyingzhongxin',
-        '103': 'iconfont icon-group_fill',
-        '104': 'iconfont icon-zhanghaoquanxianguanli',
-        '105': 'iconfont icon-daibanshixiang',
-        '106': 'iconfont icon-qianniudaidise'
+        '101': 'iconfont icon-s-order',
+        '102': 'iconfont icon-postcard',
+        '103': 'iconfont icon-user-solid',
+        '104': 'iconfont icon-s-tools',
+        '105': 'iconfont icon-data-analysis',
+        '106': 'iconfont icon-s-management',
+        '107': 'iconfont icon-set-up',
+        '108': 'iconfont icon-cherry'
       },
       // 被激活的链接地址
       activePath: ''
@@ -242,7 +261,7 @@ export default {
     letter-spacing: 0.2em;
     text-align: center;
     > i {
-      color: #fff;
+      color: #409eff;
       cursor: pointer;
     }
   }

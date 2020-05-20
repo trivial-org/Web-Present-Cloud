@@ -1,5 +1,5 @@
 <template>
-  <div class="login_container" :style="backgroundDiv">
+  <div class="login_container">
     <div class="text">到云登录系统</div>
     <div class="login_box">
       <div class="avatar_box">
@@ -15,78 +15,112 @@
       >
         <!-- 用户名 -->
         <el-form-item prop="username">
-          <el-input
-            prefix-icon="iconfont icon-mine_fill"
-            placeholder="账号"
-            v-model="loginForm.username"
-          ></el-input>
+          <el-input prefix-icon="iconfont icon-user" placeholder="账号" v-model="loginForm.username"></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
           <el-input
-            prefix-icon="iconfont icon-lock_fill"
+            prefix-icon="iconfont icon-lock"
             placeholder="密码"
             v-model="loginForm.password"
             type="password"
           ></el-input>
         </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item prop="verificationCode">
+          <el-row>
+            <el-col :span="18">
+              <el-input prefix-icon="iconfont icon-s-help" placeholder="验证码" v-model="loginForm.verificationCode"></el-input>
+            </el-col>
+            <el-col :span="4"  class="codeClass">
+              <span @click="changeCode">
+                <img :src="imgCode">
+              </span>
+            </el-col>
+          </el-row>
+        </el-form-item>
         <!-- 按钮区域 -->
-        <el-form-item class="btns">
-          <el-button type="primary" @click="login">登录</el-button>
-          <el-button type="info" @click="resetLoginForm">重置</el-button>
+        <el-form-item class="btns-login">
+          <el-button type="primary" @click="login" style="width:410px;color=#46a6ff">登录</el-button>
+        </el-form-item>
+        <el-form-item class="btns-sigup">
+          <el-button type="primary" style="width:410px;color=#46a6ff">注册</el-button>
+        </el-form-item>
+        <el-form-item style="text-align:center">
+          <div class>
+            <el-button type="info" @click="resetLoginForm" style="width:48%">重置</el-button>
+            <el-button type="primary" style="width:48%" @click="showDialog = true">第三方登录</el-button>
+          </div>
         </el-form-item>
       </el-form>
     </div>
+    <el-dialog class="thirdparty-button" title="第三方登录" :visible.sync="showDialog">
+      请选择第三方登录方式
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import SocialSign from '@/components/SocialSignin/socialsignin.vue'
 export default {
+  components: { SocialSign },
   data () {
     return {
+      imgCode: 'http://47.95.120.250:8080/verification/code',
+      // 第三方登录对话框弹框
+      showDialog: false,
       // 登录表单数据绑定对象
       loginForm: {
         username: '',
-        password: ''
+        password: '',
+        verificationCode: ''
       },
       // 表单的验证规则对象
       loginFormRules: {
         username: [
           { required: true, message: '请输入账号', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在3-10个字符', trigger: 'blur' }
+          { min: 2, max: 10, message: '长度在2-10个字符', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, max: 15, message: '长度在6-15个字符', trigger: 'blur' }
+          { min: 1, max: 15, message: '长度在1-15个字符', trigger: 'blur' }
+        ],
+        verificationCode: [
+          {required: true, message: '请输入验证吗', trigger: 'blur'}
         ]
-      },
-      // 登录界面的背景图
-      backgroundDiv: {
-        backgroundImage:
-          'url(' + require('../assets/login_background.jpg') + ')',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% 100%'
       }
+      // // 登录界面的背景图
+      // backgroundDiv: {
+      //   backgroundImage:
+      //     'url(' + require('../assets/login_background.jpg') + ')',
+      //   backgroundRepeat: 'no-repeat',
+      //   backgroundSize: '100% 100%'
+      // }
     }
   },
   methods: {
+    changeCode () {
+      var num = Math.ceil(Math.random() * 10)
+      this.imgCode = this.imgCode + '?' + num
+    },
     resetLoginForm () {
       this.$refs.loginFormRef.resetFields()
     },
     login () {
-      this.$refs.loginFormRef.validate(async (valid) => {
+      this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
-        const {data: res} = await this.$http.post('login', this.loginForm)
-        if (res.meta.status !== 200) return this.$message.error('登录失败')
-        this.$message.error('登录成功')
+        const { data: res } = await this.$http.post('signin', this.loginForm)
+        console.log(res)
+        if (res.state !== 'success') return this.$message.error(res.msg)
+        this.$message.success('登录成功')
         /*
             1.将登录成功之后的token保存到客户端的sessionStorage中
                 项目中除了登录之外的其他API接口，必须在登录之后才能访问
                 token只应在当前网站打开期间有效，所以将token保存在sessionStorage中
             2.通过编程式导航跳转到后台主页，路由地址是 /home
         */
-        window.sessionStorage.setItem('token', res.data.token)
-        this.$router.push('/home')
+        // window.sessionStorage.setItem('token', res.data.token)
+        this.$router.push('/welcome')
       })
     }
   }
@@ -94,6 +128,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.codeClass {
+  text-align: center;
+  top: 30%;
+}
 .text {
   text-align: center;
   line-height: 200px;
@@ -102,18 +140,19 @@ export default {
 }
 
 .login_container {
+  background-color: #2d3a4b;
   height: 100%;
 }
 
 .login_box {
   width: 450px;
-  height: 300px;
-  background-color: #ffffff;
+  height: 50%;
+  background-color: #2d3a4b;
   border-radius: 3px;
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -30%);
 
   .avatar_box {
     height: 130px;
@@ -124,7 +163,7 @@ export default {
     box-shadow: 0 0 10px #ddd;
     position: absolute;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -60%);
     background-color: #00ff80;
     img {
       width: 100%;
@@ -137,14 +176,15 @@ export default {
 
 .login_form {
   position: absolute;
-  bottom: 0;
+  top: 100px;
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
 }
 
-.btns {
-  display: flex;
-  justify-content: flex-end;
+@media only screen and (max-width: 470px) {
+  .thirdparty-button {
+    display: none;
+  }
 }
 </style>
