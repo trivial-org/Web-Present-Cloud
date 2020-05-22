@@ -10,13 +10,13 @@
       <el-row class="searchRow" :gutter="20">
         <el-col :span="8">
           <el-input
-            placeholder="请输入搜索内容"
+            placeholder="请输入用户名"
             class="inputSearch"
-            v-model="queryInfo.query"
+            v-model="queryText"
             clearable
             @clear="getUserList"
           >
-            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="searchUsers"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -24,7 +24,7 @@
         </el-col>
       </el-row>
       <!-- 用户列表区域 -->
-      <el-table :data="userslist" stripe>
+      <el-table v-if="showUsersList" :data="userslist" stripe>
         <el-table-column type="index" label="#" fixed></el-table-column>
         <el-table-column label="姓名" prop="username"></el-table-column>
         <el-table-column label="邮箱" prop="email"></el-table-column>
@@ -37,7 +37,48 @@
               type="primary"
               icon="el-icon-edit"
               size="mini"
-              @click="showEditDialog(scope.row.username)"
+              @click="showEditDialog(scope.row.id)"
+            ></el-button>
+            <!-- 删除用户按钮 -->
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removeUserById(scope.row.id)"
+            ></el-button>
+            <!-- 分配角色按钮 -->
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="分配角色"
+              placement="top"
+              :enterable="false"
+            >
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+                circle
+                @click="showSetRole(scope.row)"
+              ></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-if="!showUsersList" :data="searchUserslist" stripe>
+        <el-table-column type="index" label="#" fixed></el-table-column>
+        <el-table-column label="姓名" prop="username"></el-table-column>
+        <el-table-column label="邮箱" prop="email"></el-table-column>
+        <el-table-column label="联系方式" prop="phone"></el-table-column>
+        <el-table-column label="角色" prop="roleName"></el-table-column>
+        <el-table-column label="操作" width="200" fixed="right">
+          <template slot-scope="scope">
+            <!-- 修改用户按钮 -->
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showEditDialog(scope.row.id)"
             ></el-button>
             <!-- 删除用户按钮 -->
             <el-button
@@ -150,7 +191,7 @@
     >
       <div>
         <p>当前用户：{{userInfo.username}}</p>
-        <p>当前角色：{{userInfo.role_name}}</p>
+        <p>当前角色：{{userInfo.roleName}}</p>
         <p>
           分配角色：
           <el-select
@@ -199,14 +240,19 @@ export default {
       callback(new Error('请输入合法的手机号码'))
     }
     return {
+      // 展示控制
+      showUsersList: true,
+      // 根据用户名模糊查询用户
+      queryText: '',
       queryInfo: {
         // query: '',
         // 当前的页数
         page: 1,
         // 当前每页显示多少条数据
-        pageSize: 5
+        pageSize: 10
       },
       userslist: [],
+      searchUserslist: [],
       total: 0,
       // 控制添加用户的显示与隐藏
       addDialogVisible: false,
@@ -239,7 +285,9 @@ export default {
       editUserForm: {},
       // 编辑用户表单验证
       editUserFormRules: {
-        password: [{ min: 1, max: 15, message: '长度在1-15个字符', trigger: 'blur' }],
+        password: [
+          { min: 1, max: 15, message: '长度在1-15个字符', trigger: 'blur' }
+        ],
         email: [{ validator: checkEmail, trigger: 'blur' }],
         phone: [{ validator: checkMobile, trigger: 'blur' }]
       },
@@ -264,16 +312,30 @@ export default {
     this.getUserList()
   },
   methods: {
-    async getUserList () {
-      const {data: res} = await this.$http.get(
-        'super/users',
-        {params: this.queryInfo}
+    // 模糊查询
+    async searchUsers () {
+      const { data: res } = await this.$http.get(
+        'super/users?username=' + this.queryText
       )
-      console.log(this.queryInfo)
+      if (res.state !== 'success') {
+        return this.$message.error('查询用户列表失败')
+      }
       console.log(res)
+      this.showUsersList = false
+      this.searchUserslist.splice(0, 1)
+      this.searchUserslist.push(res.result)
+      console.log(this.searchUserslist)
+      this.total = 1
+    },
+    async getUserList () {
+      const { data: res } = await this.$http.get('super/users', {
+        params: this.queryInfo
+      })
       if (res.state !== 'success') {
         return this.$message.error('获取用户列表失败')
       }
+      console.log(res.result)
+      this.showUsersList = true
       this.userslist = res.result
       this.total = res.result.length
     },
@@ -295,11 +357,9 @@ export default {
     addUser () {
       // 提交请求前，表单预验证
       this.$refs.addFormRef.validate(async valid => {
-        console.log('开始提交')
         // 表单预校验失败
         if (!valid) return
         const { data: res } = await this.$http.post('super/users', this.addForm)
-        console.log(res)
         if (res.state !== 'success') {
           this.$message.error('添加用户失败！')
         }
@@ -311,12 +371,13 @@ export default {
       })
     },
     // 编辑用户信息
-    async showEditDialog (qname) {
-      const { data: res } = await this.$http.get('/user/info?userName=' + qname)
+    async showEditDialog (id) {
+      const { data: res } = await this.$http.get('super/users?userId=' + id)
       if (res.state !== 'success') {
         return this.$message.error('查询用户信息失败！')
       }
       this.editUserForm = res.result
+      console.log(this.editUserForm)
       this.editDialogVisible = true
     },
     // 监听修改用户对话框的关闭事件
@@ -359,9 +420,7 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已取消删除')
       }
-      const { data: res } = await this.$http.delete(
-        'super/users?userId=' + id
-      )
+      const { data: res } = await this.$http.delete('super/users?userId=' + id)
       if (res.state !== 'success') return this.$message.error('删除用户失败！')
       this.$message.success('删除用户成功！')
       this.getUserList()
@@ -384,13 +443,10 @@ export default {
       if (!this.selectRoleId) {
         return this.$message.error('请选择要分配的角色')
       }
-      const { data: res } = await this.$http.put(
-        'super/users',
-        {
-          id: this.userForRoleId,
-          roleId: this.selectRoleId
-        }
-      )
+      const { data: res } = await this.$http.put('super/users', {
+        id: this.userForRoleId,
+        roleId: this.selectRoleId
+      })
       console.log(res)
       if (res.state !== 'success') {
         return this.$message.error('更新用户角色失败！')

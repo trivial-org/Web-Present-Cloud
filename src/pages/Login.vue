@@ -49,14 +49,11 @@
         <el-form-item style="text-align:center">
           <div class>
             <el-button type="info" @click="resetLoginForm" style="width:48%">重置</el-button>
-            <el-button type="primary" style="width:48%" @click="showDialog = true">第三方登录</el-button>
+            <el-button type="primary" style="width:48%" @click="forgetPassword">忘记密码</el-button>
           </div>
         </el-form-item>
       </el-form>
     </div>
-    <el-dialog class="thirdparty-button" title="第三方登录" :visible.sync="showDialog">
-      请选择第三方登录方式
-    </el-dialog>
   </div>
 </template>
 
@@ -67,8 +64,6 @@ export default {
   data () {
     return {
       imgCode: 'http://47.95.120.250:8080/verification/code',
-      // 第三方登录对话框弹框
-      showDialog: false,
       // 登录表单数据绑定对象
       loginForm: {
         username: '',
@@ -99,6 +94,9 @@ export default {
     }
   },
   methods: {
+    forgetPassword () {
+      this.$router.push('/forget-password')
+    },
     changeCode () {
       var num = Math.ceil(Math.random() * 10)
       this.imgCode = this.imgCode + '?' + num
@@ -119,7 +117,8 @@ export default {
                 token只应在当前网站打开期间有效，所以将token保存在sessionStorage中
             2.通过编程式导航跳转到后台主页，路由地址是 /home
         */
-        // window.sessionStorage.setItem('token', res.data.token)
+        console.log(res.result.token)
+        window.localStorage.setItem('token', res.result.token)
         this.$router.push('/welcome')
       })
     }

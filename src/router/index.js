@@ -12,6 +12,7 @@ import dataDictionaryManage from '@/components/DataDictionary/dataDictionaryMana
 import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput'
 import parameterSet from '@/components/ParameterSet/parameterSet'
 import Role from '@/components/Roles/roles'
+import ForgetPassword from '@/pages/forgetPassword.vue'
 
 Vue.use(Router)
 
@@ -20,6 +21,10 @@ const router = new Router({
     {
       path: '/login',
       component: Login
+    },
+    {
+      path: '/forget-password',
+      component: ForgetPassword
     },
     {
       path: '/',
@@ -86,17 +91,17 @@ const router = new Router({
 })
 
 // 挂载路由导航守卫
-// router.beforeEach((to, from, next) => {
-//   // to 将要访问的路径
-//   // from 代表从哪个路径跳转而来
-//   // next 是一个函数 表示方放行
-//   // next() 放行 next('/login') 强制跳转
+router.beforeEach((to, from, next) => {
+  // to 将要访问的路径
+  // from 代表从哪个路径跳转而来
+  // next 是一个函数 表示方放行
+  // next() 放行 next('/login') 强制跳转
 
-//   if (to.path === '/login') { return next() }
-//   // 获取token
-//   const tokenStr = window.sessionStorage.getItem('token')
-//   if (!tokenStr) { return next('/login') }
-//   next()
-// })
+  if (to.path === '/login' || to.path === '/forget-password') { return next() }
+  // 获取token
+  const tokenStr = window.localStorage.getItem('token')
+  if (!tokenStr) { return next('/login') }
+  next()
+})
 
 export default router

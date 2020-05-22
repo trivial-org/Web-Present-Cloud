@@ -194,7 +194,7 @@ export default {
   },
   methods: {
     logout () {
-      window.sessionStorage.clear()
+      window.localStorage.clear()
       this.$router.push('/login')
     },
     // 点击按钮   切换菜单的折叠与展开
