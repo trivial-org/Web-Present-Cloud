@@ -12,7 +12,6 @@ import dataDictionaryManage from '@/components/DataDictionary/dataDictionaryMana
 import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput'
 import parameterSet from '@/components/ParameterSet/parameterSet'
 import Role from '@/components/Roles/roles'
-import ForgetPassword from '@/pages/forgetPassword.vue'
 
 Vue.use(Router)
 
@@ -21,10 +20,6 @@ const router = new Router({
     {
       path: '/login',
       component: Login
-    },
-    {
-      path: '/forget-password',
-      component: ForgetPassword
     },
     {
       path: '/',

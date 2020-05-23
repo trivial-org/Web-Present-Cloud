@@ -310,6 +310,7 @@ export default {
   },
   created () {
     this.getUserList()
+    this.getTotal()
   },
   methods: {
     // 模糊查询
@@ -320,11 +321,9 @@ export default {
       if (res.state !== 'success') {
         return this.$message.error('查询用户列表失败')
       }
-      console.log(res)
       this.showUsersList = false
       this.searchUserslist.splice(0, 1)
       this.searchUserslist.push(res.result)
-      console.log(this.searchUserslist)
       this.total = 1
     },
     async getUserList () {
@@ -334,10 +333,13 @@ export default {
       if (res.state !== 'success') {
         return this.$message.error('获取用户列表失败')
       }
-      console.log(res.result)
       this.showUsersList = true
       this.userslist = res.result
-      this.total = res.result.length
+    },
+    // 获取总用户数
+    async getTotal () {
+      const { data: res } = await this.$http.get('super/users/total')
+      this.total = res.result
     },
     // 监听 pagesize 改变的事件
     handleSizeChange (newSize) {
@@ -360,6 +362,7 @@ export default {
         // 表单预校验失败
         if (!valid) return
         const { data: res } = await this.$http.post('super/users', this.addForm)
+        console.log(res)
         if (res.state !== 'success') {
           this.$message.error('添加用户失败！')
         }

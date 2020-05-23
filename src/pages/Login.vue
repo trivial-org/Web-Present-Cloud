@@ -43,15 +43,6 @@
         <el-form-item class="btns-login">
           <el-button type="primary" @click="login" style="width:410px;color=#46a6ff">登录</el-button>
         </el-form-item>
-        <el-form-item class="btns-sigup">
-          <el-button type="primary" style="width:410px;color=#46a6ff">注册</el-button>
-        </el-form-item>
-        <el-form-item style="text-align:center">
-          <div class>
-            <el-button type="info" @click="resetLoginForm" style="width:48%">重置</el-button>
-            <el-button type="primary" style="width:48%" @click="forgetPassword">忘记密码</el-button>
-          </div>
-        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -94,21 +85,14 @@ export default {
     }
   },
   methods: {
-    forgetPassword () {
-      this.$router.push('/forget-password')
-    },
     changeCode () {
       var num = Math.ceil(Math.random() * 10)
       this.imgCode = this.imgCode + '?' + num
-    },
-    resetLoginForm () {
-      this.$refs.loginFormRef.resetFields()
     },
     login () {
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post('signin', this.loginForm)
-        console.log(res)
         if (res.state !== 'success') return this.$message.error(res.msg)
         this.$message.success('登录成功')
         /*
@@ -117,7 +101,7 @@ export default {
                 token只应在当前网站打开期间有效，所以将token保存在sessionStorage中
             2.通过编程式导航跳转到后台主页，路由地址是 /home
         */
-        console.log(res.result.token)
+        window.localStorage.setItem('username', this.loginForm.username)
         window.localStorage.setItem('token', res.result.token)
         this.$router.push('/welcome')
       })

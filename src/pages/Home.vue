@@ -6,7 +6,17 @@
         <img src="../assets/logo.jpg" width="7.5%" height="8.5%" />
         <span>到云后台管理系统</span>
       </div>
-      <el-button type="info" @click="logout" size="mini">退出</el-button>
+      <div>
+        <div class="trivial">欢迎,</div>
+        <div class="userInfo">{{username}}</div>
+        <el-popover ref="popover5" placement="top" width="40" v-model="visible2">
+          <div>个人信息</div>
+          <el-button type="text" @click="showPswdDialog">修改密码</el-button>
+        </el-popover>
+
+        <el-button v-popover:popover5 class="icon"></el-button>
+        <el-button type="info" @click="logout" size="mini">退出</el-button>
+      </div>
     </el-header>
     <!-- 页面主体区域 -->
     <el-container>
@@ -72,6 +82,30 @@
         <router-view></router-view>
       </el-main>
     </el-container>
+    <!-- 修改密码对话框 -->
+    <el-dialog
+      title="修改密码"
+      :visible.sync="pswdDialogVisible"
+      width="40%"
+      center
+      @close="pswdDialogClosed"
+    >
+      <el-form :model="pswdForm" ref="pswdFormRef" :rules="pswdFormRules" label-width="70px">
+        <el-form-item label="用户ID">
+          <el-input v-model="pswdForm.id" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input v-model="pswdForm.newPassword"></el-input>
+        </el-form-item>
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input v-model="pswdForm.oldPassword"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="pswdDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="changPswd">确 定</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -79,6 +113,10 @@
 export default {
   data () {
     return {
+      pswdDialogVisible: false,
+      visible2: false,
+      // 用户名
+      username: localStorage.getItem('username'),
       // 左侧菜单数据
       menulist: [
         {
@@ -155,7 +193,8 @@ export default {
               children: []
             }
           ]
-        }, {
+        },
+        {
           id: 107,
           authName: '参数设置',
           path: 'parameter-Set',
@@ -167,7 +206,8 @@ export default {
               children: []
             }
           ]
-        }, {
+        },
+        {
           id: 108,
           authName: '组织管理',
           path: 'organization-manage',
@@ -186,16 +226,75 @@ export default {
         '108': 'iconfont icon-cherry'
       },
       // 被激活的链接地址
-      activePath: ''
+      activePath: '',
+      // 修改密码表单
+      pswdForm: {
+        id: '',
+        newPassword: '',
+        oldPassword: ''
+      },
+      // 编辑修改用户密码表单验证
+      pswdFormRules: {
+        newPassword: [
+          {
+            required: true,
+            min: 1,
+            max: 15,
+            message: '长度在1-15个字符',
+            trigger: 'blur'
+          }
+        ],
+        oldPassword: [
+          {
+            required: true,
+            min: 1,
+            max: 15,
+            message: '长度在1-15个字符',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   created () {
     this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
-    logout () {
+    async logout () {
+      const { data: res } = await this.$http.post('/signout', {
+        username: this.username
+      })
+      if (res.state !== 'success') {
+        this.$message.error('注销失败！')
+      }
+      this.$message.success('注销成功')
       window.localStorage.clear()
       this.$router.push('/login')
+    },
+    showpopover () {
+      this.visible2 = true
+    },
+    // 展示修改密码对话框
+    async showPswdDialog () {
+      const { data: res } = await this.$http.get(
+        'super/users?username=' + localStorage.getItem('username')
+      )
+      this.pswdForm.id = res.result.id
+      this.pswdForm = this.pswdForm
+      this.pswdDialogVisible = true
+    },
+    // 监听修改密码对话框的关闭事件
+    pswdDialogClosed () {
+      this.$refs.pswdFormRef.resetFields()
+    },
+    // 修改密码
+    async changPswd () {
+      const { data: res } = await this.$http.put('user/password', this.pswdForm)
+      if (res.state !== 'success') {
+        this.$message.error('修改密码失败！')
+      }
+      this.$message.success('修改密码成功！')
+      this.pswdDialogVisible = false
     },
     // 点击按钮   切换菜单的折叠与展开
     toggleCollapse () {
@@ -224,6 +323,35 @@ export default {
 </script>
 
 <style lang="less">
+.dropdown-info {
+  background-color: #304156;
+  width: 30px; // 你要的正方形
+  height: 30px; // 你要的正方形
+  margin-right: 13px;
+}
+.userInfo {
+  color: #00ff40;
+  margin-left: 10px;
+  margin-right: 3px;
+}
+
+.icon {
+  margin-right: 13px;
+  width: 30px; // 你要的正方形
+  height: 30px; // 你要的正方形
+  background-image: url(../assets/icon.jpg);
+  background-position: center center; // 居中
+  background-size: cover; // 填满div
+  background-repeat: no-repeat;
+  border-radius: 10%;
+}
+
+.popover {
+  width: 30px;
+  height: 30px;
+  background-color: #304156;
+  margin-right: 10px;
+}
 .home-container {
   height: 100%;
 }
