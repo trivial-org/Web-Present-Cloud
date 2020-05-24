@@ -4,13 +4,13 @@
     <el-header>
       <div class="img-adj">
         <img src="../assets/logo.jpg" width="7.5%" height="8.5%" />
-        <span>到云后台管理系统</span>
+        <el-button type="text" @click="goToHome">到云后台管理系统</el-button>
       </div>
       <div>
         <div class="trivial">欢迎,</div>
         <div class="userInfo">{{username}}</div>
         <el-popover ref="popover5" placement="top" width="40" v-model="visible2">
-          <div>个人信息</div>
+          <el-button type="text">个人信息</el-button>
           <el-button type="text" @click="showPswdDialog">修改密码</el-button>
         </el-popover>
 
@@ -103,7 +103,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="pswdDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="changPswd">确 定</el-button>
+        <el-button type="primary" @click="changePswd">确 定</el-button>
       </span>
     </el-dialog>
   </el-container>
@@ -260,6 +260,9 @@ export default {
     this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
+    goToHome () {
+      this.$router.push('/welcome')
+    },
     async logout () {
       const { data: res } = await this.$http.post('/signout', {
         username: this.username
@@ -279,8 +282,7 @@ export default {
       const { data: res } = await this.$http.get(
         'super/users?username=' + localStorage.getItem('username')
       )
-      this.pswdForm.id = res.result.id
-      this.pswdForm = this.pswdForm
+      this.$set(this.pswdForm, 'id', res.result.id)
       this.pswdDialogVisible = true
     },
     // 监听修改密码对话框的关闭事件
@@ -288,13 +290,16 @@ export default {
       this.$refs.pswdFormRef.resetFields()
     },
     // 修改密码
-    async changPswd () {
-      const { data: res } = await this.$http.put('user/password', this.pswdForm)
-      if (res.state !== 'success') {
-        this.$message.error('修改密码失败！')
-      }
-      this.$message.success('修改密码成功！')
-      this.pswdDialogVisible = false
+    async changePswd () {
+      this.$refs.pswdFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.put('user/password', this.pswdForm)
+        if (res.state !== 'success') {
+          return this.$message.error('修改密码失败！')
+        }
+        this.$message.success('修改密码成功！')
+        this.pswdDialogVisible = false
+      })
     },
     // 点击按钮   切换菜单的折叠与展开
     toggleCollapse () {
