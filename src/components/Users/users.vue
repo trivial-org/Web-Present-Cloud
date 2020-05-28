@@ -362,7 +362,6 @@ export default {
         // 表单预校验失败
         if (!valid) return
         const { data: res } = await this.$http.post('super/users', this.addForm)
-        console.log(res)
         if (res.state !== 'success') {
           this.$message.error('添加用户失败！')
         }
@@ -380,7 +379,6 @@ export default {
         return this.$message.error('查询用户信息失败！')
       }
       this.editUserForm = res.result
-      console.log(this.editUserForm)
       this.editDialogVisible = true
     },
     // 监听修改用户对话框的关闭事件
@@ -436,7 +434,6 @@ export default {
       if (res.state !== 'success') {
         return this.$message.error('获取角色列表失败！')
       }
-      console.log(res)
       this.userForRoleId = this.userInfo.id
       this.rolesLsit = res.result
       this.setRoleDialogVisible = true
@@ -450,7 +447,6 @@ export default {
         id: this.userForRoleId,
         roleId: this.selectRoleId
       })
-      console.log(res)
       if (res.state !== 'success') {
         return this.$message.error('更新用户角色失败！')
       }
