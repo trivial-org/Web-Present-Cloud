@@ -144,8 +144,8 @@ export default {
           children: [
             {
               id: 1061,
-              authName: '课程信息',
-              path: 'courses-info',
+              authName: '课程列表',
+              path: 'courses-list',
               children: []
             },
             {

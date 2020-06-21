@@ -12,6 +12,7 @@ import dataDictionaryManage from '@/components/DataDictionary/dataDictionaryMana
 import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput'
 import parameterSet from '@/components/ParameterSet/parameterSet'
 import Role from '@/components/Roles/roles'
+import Courses from '@/components/Courses/courses.vue'
 
 Vue.use(Router)
 
@@ -64,6 +65,11 @@ const router = new Router({
           name: 'parameterSet',
           path: '/parameterSet',
           component: parameterSet
+        },
+        {
+          name: 'Courses',
+          path: '/courses-list',
+          component: Courses
         }
       ]
     },
