@@ -330,6 +330,7 @@ export default {
       const { data: res } = await this.$http.get('super/users', {
         params: this.queryInfo
       })
+      console.log(res)
       if (res.state !== 'success') {
         return this.$message.error('获取用户列表失败')
       }
@@ -364,6 +365,7 @@ export default {
         const { data: res } = await this.$http.post('super/users', this.addForm)
         if (res.state !== 'success') {
           this.$message.error('添加用户失败！')
+          return
         }
         this.$message.success('添加用户成功！')
         // 隐藏添加用户对话框

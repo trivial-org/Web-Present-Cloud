@@ -24,7 +24,19 @@ axios.interceptors.request.use(
     return config
   },
   error => {
-    return Promise.reject(error)
+    if (error && error.status) {
+      switch (error.response.status) {
+        case 403:
+          router.push('/E_403')
+          break
+        case 404:
+          router.push('/E_404')
+          break
+        case 500:
+          router.push('/E_500')
+          break
+      }
+    } else { return Promise.reject(error) }
   })
 // Vue.config.productionTip = false
 

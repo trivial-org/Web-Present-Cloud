@@ -12,11 +12,26 @@ import dataDictionaryManage from '@/components/DataDictionary/dataDictionaryMana
 import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput'
 import parameterSet from '@/components/ParameterSet/parameterSet'
 import Role from '@/components/Roles/roles'
+import E_403 from '@/pages/error-page/403'
+import E_404 from '@/pages/error-page/404'
+import E_500 from '@/pages/error-page/500'
 
 Vue.use(Router)
 
 const router = new Router({
   routes: [
+    {
+      path: '/403',
+      component: E_403
+    },
+    {
+      path: '/404',
+      component: E_404
+    },
+    {
+      path: '/500',
+      component: E_500
+    },
     {
       path: '/login',
       component: Login
