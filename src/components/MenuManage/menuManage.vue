@@ -7,13 +7,28 @@
     </el-breadcrumb>
 
     <el-card class="menulist-card">
-
+      <div></div>
     </el-card>
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data () {
+    return {
+      queryInfo: {}
+    }
+  },
+  created () {
+    this.getCourseList()
+  },
+  methods: {
+    async getCourseList () {
+      const { data: res } = await this.$http.get('/user/createdClass')
+      console.log(res)
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>

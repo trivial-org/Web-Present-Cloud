@@ -13,8 +13,31 @@ import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
 axios.defaults.baseURL = 'http://47.95.120.250:8080/'
+// axios.defaults.headers.common['Authorization'] = window.localStorage.getItem('token')
 axios.defaults.withCredentials = true
 Vue.prototype.$http = axios
+axios.interceptors.request.use(
+  config => {
+    if (localStorage.getItem('token')) {
+      config.headers.myAuthorization = localStorage.getItem('token')
+    }
+    return config
+  },
+  error => {
+    if (error && error.status) {
+      switch (error.response.status) {
+        case 403:
+          router.push('/E_403')
+          break
+        case 404:
+          router.push('/E_404')
+          break
+        case 500:
+          router.push('/E_500')
+          break
+      }
+    } else { return Promise.reject(error) }
+  })
 // Vue.config.productionTip = false
 
 /* eslint-disable no-new */
