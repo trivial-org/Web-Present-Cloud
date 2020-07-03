@@ -300,7 +300,6 @@ export default {
         return this.$message.info('已取消删除')
       }
       const { data: res } = await this.$http.delete('role?roleId=' + id)
-      console.log(res)
       if (res.state !== 'success') return this.$message.error('删除角色失败！')
       this.$message.success('删除角色成功！')
       this.getRolesList()

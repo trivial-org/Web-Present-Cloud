@@ -103,7 +103,9 @@ export default {
         */
         window.localStorage.setItem('username', this.loginForm.username)
         window.localStorage.setItem('token', res.result.token)
-        this.$router.push('/welcome')
+        this.$router.push({
+          path: '/welcome'
+        })
       })
     }
   }

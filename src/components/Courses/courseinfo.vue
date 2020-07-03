@@ -96,133 +96,129 @@
 </template>
 
 <script>
-    import Member from './components/Member.vue'
-    import Activity from './components/Activity.vue'
-    //
-    export default {
-        name: 'Tab',
-        components: { Member, Activity },
-        data() {
-            return {
-                queryInfo: {
-                    page: 1,
-                    pageSize: 10
-                },
-                activeName:'information',
-                showInformation:true,
-                showEditInformation:false,
-                //课程id
-                orgCode: 0,
-                memberTableData: [],
-                activityTableData: [],
-                informationTableData: {
-                    // classCloud:{
-                    //     school:'',
-                    //     college:'',
-                    //     className:'',
-                    //     grade:'',
-                    //     teachingMateria:'',
-                    //     lessonStartDate:'',
-                    //     lessonEndDate:'',
-                    //     introduction:''
-                    // }
-                },
-                informationFormRules:{
-                    className: [
-                        {required:true, message:'请输入课程名称', trigger:'blur'},
-                        {min: 1, max: 15, message: '课程名称长度在1-10个',trigger: 'blur'}
-                    ]
-                },
-                createActivityInfo: {
-                    activityTypeId:2,
-                    activityDescription: '第一次作业',
-                    maxscore: 4,			//活动分数
-                    orgCode: 10002,
-                }
-            }
-
-        },
-        watch: {
-
-        },
-        created() {
-            this.getParamsData();
-            // this.createdActivity()
-        },
-        methods: {
-            handleTabClick() {
-                console.log(this.activeName)
-                this.getParamsData()
-            },
-            //获取参数的列表数据
-            async getParamsData() {
-                this.orgCode = this.$route.query.orgCode
-                console.log(this.orgCode)
-                if(this.activeName == "members"){
-                    const {data: res} = await this.$http.get(`/cloudClass/members?orgCode=`+this.orgCode,{
-                        params: this.queryInfo
-                    })
-                    if(res.state !== 'success'){
-                        return this.$message.error('获取成员列表失败')
-                    }
-                    console.log(res)
-                    this.memberTableData = res.result
-                }else if(this.activeName == 'activities'){
-                    const {data: res} = await this.$http.get(`/activities?orgCode=`+this.orgCode)
-                    if(res.state !== 'success'){
-                        return this.$message.error('获取活动列表失败')
-                    }
-                    console.log(res)
-                    this.activityTableData = res.result
-                }else if(this.activeName == 'information'){
-                    const {data: res} = await this.$http.get(`/cloudClass?orgCode=`+this.orgCode)
-                    if(res.state !== 'success'){
-                        return this.$message.error('获取课程详情列表失败')
-                    }
-                    this.informationTableData = res.result.classCloud
-                    // this.orgCode =
-                    console.log(this.informationTableData)
-                }
-
-            },
-            async createdActivity() {
-                const {data: res} = await this.$http.post('/activities',this.createActivityInfo)
-                if(res.state !== 'success'){
-                    return this.$message.error('创建活动失败')
-                }
-                console.log(res)
-                this.memberTableData = res.result
-            },
-            showEditDialog() {
-                this.showInformation = !this.showInformation;
-                this.showEditInformation = !this.showEditInformation;
-            },
-
-            editCourse() {
-                this.$refs.informationFormRef.validate(async valid =>
-                {
-                    if(!valid) return
-                    const { data: res } = await this.$http.put(
-                        'cloudClass?orgCode='+this.orgCode,
-                        this.informationTableData
-                    )
-                    if (res.state !== 'success') {
-                        this.$message.error('更新课程信息失败！')
-                    }
-
-                    this.showEditDialog();
-                    this.getParamsData();
-                    // this.getCourseList()
-                    this.$message.success("更新课程信息成功")
-                })
-            },
-            editCourseClosed() {
-                this.$refs.informationFormRef.resetFields();
-                this.showEditDialog();
-            }
-        }
+import Member from './components/Member.vue'
+import Activity from './components/Activity.vue'
+//
+export default {
+  name: 'Tab',
+  components: { Member, Activity },
+  data () {
+    return {
+      queryInfo: {
+        page: 1,
+        pageSize: 10
+      },
+      activeName: 'information',
+      showInformation: true,
+      showEditInformation: false,
+      // 课程id
+      orgCode: 0,
+      memberTableData: [],
+      activityTableData: [],
+      informationTableData: {
+        // classCloud:{
+        //     school:'',
+        //     college:'',
+        //     className:'',
+        //     grade:'',
+        //     teachingMateria:'',
+        //     lessonStartDate:'',
+        //     lessonEndDate:'',
+        //     introduction:''
+        // }
+      },
+      informationFormRules: {
+        className: [
+          {required: true, message: '请输入课程名称', trigger: 'blur'},
+          {min: 1, max: 15, message: '课程名称长度在1-10个', trigger: 'blur'}
+        ]
+      },
+      createActivityInfo: {
+        activityTypeId: 2,
+        activityDescription: '第一次作业',
+        maxscore: 4, // 活动分数
+        orgCode: 10002
+      }
     }
-</script>s
+  },
+  watch: {
+
+  },
+  created () {
+    this.getParamsData()
+    // this.createdActivity()
+  },
+  methods: {
+    handleTabClick () {
+      console.log(this.activeName)
+      this.getParamsData()
+    },
+    // 获取参数的列表数据
+    async getParamsData () {
+      this.orgCode = this.$route.query.orgCode
+      if (this.activeName === 'members') {
+        const {data: res} = await this.$http.get(`/cloudClass/members?orgCode=` + this.orgCode, {
+          params: this.queryInfo
+        })
+        if (res.state !== 'success') {
+          return this.$message.error('获取成员列表失败')
+        }
+        console.log(res)
+        this.memberTableData = res.result
+      } else if (this.activeName === 'activities') {
+        const {data: res} = await this.$http.get(`/activities?orgCode=` + this.orgCode)
+        if (res.state !== 'success') {
+          return this.$message.error('获取活动列表失败')
+        }
+        console.log(res)
+        this.activityTableData = res.result
+      } else if (this.activeName === 'information') {
+        const {data: res} = await this.$http.get(`/cloudClass?orgCode=` + this.orgCode)
+        if (res.state !== 'success') {
+          return this.$message.error('获取课程详情列表失败')
+        }
+        this.informationTableData = res.result.classCloud
+        // this.orgCode =
+        console.log(this.informationTableData)
+      }
+    },
+    async createdActivity () {
+      const {data: res} = await this.$http.post('/activities', this.createActivityInfo)
+      if (res.state !== 'success') {
+        return this.$message.error('创建活动失败')
+      }
+      console.log(res)
+      this.memberTableData = res.result
+    },
+    showEditDialog () {
+      this.showInformation = !this.showInformation
+      this.showEditInformation = !this.showEditInformation
+    },
+
+    editCourse () {
+      this.$refs.informationFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.put(
+          'cloudClass?orgCode=' + this.orgCode,
+          this.informationTableData
+        )
+        if (res.state !== 'success') {
+          this.$message.error('更新课程信息失败！')
+        }
+
+        this.showEditDialog()
+        this.getParamsData()
+        // this.getCourseList()
+        this.$message.success('更新课程信息成功')
+      })
+    },
+    editCourseClosed () {
+      this.$refs.informationFormRef.resetFields()
+      this.showEditDialog()
+    }
+  }
+}
+</script>
 
 <style scoped>
 .icon-edit{
@@ -230,4 +226,3 @@
   margin-right: 40px;
 }
 </style>
-

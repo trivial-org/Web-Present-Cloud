@@ -403,8 +403,8 @@ export default {
         }
         // 隐藏添加用户对话框
         this.editDialogVisible = false
-          this.$message.success('更新用户信息成功！')
-          this.getUserList()
+        this.$message.success('更新用户信息成功！')
+        this.getUserList()
       })
     },
     // 删除用户
