@@ -85,14 +85,15 @@
             <el-table-column type="index"></el-table-column>
             <el-table-column label="活动id" prop="activityId"></el-table-column>
             <el-table-column label="签到类型" prop="answerLength" :formatter="signstyleFormat"></el-table-column>
-            <el-table-column label="开始时间" prop="beginDate"></el-table-column>
+            <el-table-column label="签到开始时间" prop="beginDate"></el-table-column>
+            <el-table-column label="签到结束时间" prop="endDate"></el-table-column>
             <el-table-column label="状态" prop="isActive" :formatter="stateFormat"></el-table-column>
             <el-table-column label="操作" width="200" fixed="right">
               <template slot-scope="scope">
                 <el-tooltip
                   class="item"
                   effect="dark"
-                  content="详情"
+                  content="查看参与详情"
                   placement="top"
                   :enterable="false"
                 >
@@ -112,15 +113,16 @@
           <el-table :data="homeworkTableData" border stripe>
             <el-table-column type="index"></el-table-column>
             <el-table-column label="活动id" prop="activityId"></el-table-column>
-            <el-table-column label="作业类型" prop="activityTypeId"></el-table-column>
-            <el-table-column label="活动创建时间" prop="beginDate"></el-table-column>
+            <el-table-column label="作业名称" prop="activityName"></el-table-column>
+            <el-table-column label="活动开始时间" prop="beginDate"></el-table-column>
+            <el-table-column label="活动结束时间" prop="endDate"></el-table-column>
             <el-table-column label="状态" prop="isActive" :formatter="stateFormat"></el-table-column>
             <el-table-column label="操作" width="200" fixed="right">
               <template slot-scope="scope">
                 <el-tooltip
                   class="item"
                   effect="dark"
-                  content="详情"
+                  content="查看参与详情"
                   placement="top"
                   :enterable="false"
                 >
