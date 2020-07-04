@@ -1,51 +1,139 @@
 <template>
-  <div>
-    <!-- 面包屑导航区域 -->
+  <div class="sa">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
       <el-breadcrumb-item>权限列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 卡片视图区域 -->
-    <el-card class="users-card">
-      <el-row class="searchRow" :gutter="20">
-        <el-col :span="4">
+    <el-card class="menulist-card">
+      <el-row>
+        <el-col :span="11">
           <el-button type="primary" @click="addDialogVisible = true">添加权限</el-button>
         </el-col>
       </el-row>
-      <el-table :data="authoritiesList" stripe>
-        <el-table-column type="index" label="#" fixed></el-table-column>
-        <el-table-column label="权限名" prop="name"></el-table-column>
-        <el-table-column label="URL" prop="url"></el-table-column>
-        <el-table-column label="备注" prop="note"></el-table-column>
-        <el-table-column label="操作"></el-table-column>
+      <el-table :data="menuInfo">
+        <el-table-column type="expand">
+          <template slot-scope="scopes">
+            <el-table :data="scopes.row.children" style="width: 100%">
+              <el-table-column type="index" label="#"></el-table-column>
+              <el-table-column label="权限名" prop="menuName"></el-table-column>
+              <el-table-column label="URL" prop="path"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                <!-- 修改用户按钮 -->
+                  <el-button
+                    type="primary"
+                    icon="el-icon-edit"
+                    size="mini"
+                    @click="showEditDialog(scope.row.id)"
+                  ></el-button>
+                  <!-- 删除用户按钮 -->
+                  <el-button
+                    type="danger"
+                    icon="el-icon-delete"
+                    size="mini"
+                    @click="removeMenuById(scope.row.id)"
+                  ></el-button>
+              </template>
+              </el-table-column>
+            </el-table>
+          </template>
+        </el-table-column>
+        <el-table-column type="index" label="#"></el-table-column>
+        <el-table-column label="权限名" prop="menuName"></el-table-column>
+        <el-table-column label="URL" prop="path"></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <!-- 修改用户按钮 -->
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showEditDialog(scope.row.id)"
+            ></el-button>
+            <!-- 删除用户按钮 -->
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removeMenuById(scope.row.id)"
+            ></el-button>
+          </template>
+        </el-table-column>
       </el-table>
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
-      ></el-pagination>
     </el-card>
-    <!-- 添加权限的对话框 -->
+
     <el-dialog title="添加权限" :visible.sync="addDialogVisible" width="50%" @close="addDialogClosed">
       <!-- 内容主体区域 -->
-      <el-form ref="addFormRef" :rules="addFormRules" :model="addForm" label-width="80px">
-        <el-form-item label="权限名" prop="name">
-          <el-input v-model="addForm.name"></el-input>
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+        <el-form-item label="权限ID" prop="id">
+          <el-input v-model="addForm.id"></el-input>
         </el-form-item>
-        <el-form-item label="URL" prop="url">
-          <el-input v-model="addForm.URL"></el-input>
+        <el-form-item label="权限名" prop="menuName">
+          <el-input v-model="addForm.menuName"></el-input>
+        </el-form-item>
+        <el-form-item label="父权限ID" prop="parentId">
+          <el-input v-model="addForm.parentId"></el-input>
+        </el-form-item>
+        <el-form-item label="父权限名" prop="parentName">
+          <el-input v-model="addForm.parentName"></el-input>
+        </el-form-item>
+        <el-form-item label="显示顺序" prop="orderNum">
+          <el-input v-model="addForm.orderNum"></el-input>
+        </el-form-item>
+        <el-form-item label="URL" prop="path">
+          <el-input v-model="addForm.path"></el-input>
+        </el-form-item>
+        <el-form-item label="类型" prop="path">
+          <el-input v-model="addForm.path"></el-input>
         </el-form-item>
       </el-form>
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button type="primary" @click="addMenu">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 修改权限的对话框 -->
+    <el-dialog
+      title="修改权限信息"
+      :visible.sync="editDialogVisible"
+      width="50%"
+      @close="editDialogClosed"
+    >
+      <!-- 内容主体 -->
+      <el-form
+        :model="editMenuForm"
+        ref="editMenuFormRef"
+        :rules="editMenuFormRules"
+        label-width="100px"
+      >
+        <el-form-item label="权限ID">
+          <el-input v-model="editMenuForm.id" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="权限名" prop="menuName">
+          <el-input v-model="editMenuForm.menuName"></el-input>
+        </el-form-item>
+        <el-form-item label="父权限ID" prop="parentId">
+          <el-input v-model="editMenuForm.parentId"></el-input>
+        </el-form-item>
+        <el-form-item label="父权限名" prop="parentName">
+          <el-input v-model="editMenuForm.parentName"></el-input>
+        </el-form-item>
+        <el-form-item label="显示顺序" prop="orderNum">
+          <el-input v-model="editMenuForm.orderNum"></el-input>
+        </el-form-item>
+        <el-form-item label="URL" prop="MType">
+          <el-select v-model="editMenuForm.MType" placeholder="请选择权限类型" filterable allow-create default-first-option>
+            <el-option v-for="item in menuTypeList" :label="item.value" :value="item.id" :key="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editMenu">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -55,64 +143,155 @@
 export default {
   data () {
     return {
-      // 添加表单的验证规则对象
+      username: localStorage.getItem('username'),
+      menuTypeList: [
+        {id: 'M', value: '目录'},
+        {id: 'C', value: '权限'},
+        {id: 'F', value: '按钮'}
+      ],
+      menuInfo: [],
+      queryInfo: {},
+      addDialogVisible: false,
+      addForm: {
+        id: '',
+        menuName: '',
+        parentName: '',
+        parentId: '',
+        orderNum: '',
+        path: '',
+        MType: ''
+      },
       addFormRules: {
-        name: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 15, message: '用户名长度在3-15之间', trigger: 'blur' }
+        id: [
+          { required: true, message: '请输入权限ID', trigger: 'blur' }
         ],
-        url: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, max: 15, message: '长度在6-15个字符', trigger: 'blur' }
+        menuName: [
+          { required: true, message: '请输入权限名', trigger: 'blur' }
+        ],
+        parentId: [
+          { required: true, message: '请输入父权限ID', trigger: 'blur' }
+        ],
+        parentName: [
+          { required: true, message: '请输入父权限名', trigger: 'blur' }
+        ],
+        orderNum: [
+          { required: true, message: '请输入显示顺序', trigger: 'blur' }
+        ],
+        path: [
+          { required: true, message: '请输入URL', trigger: 'blur' }
         ]
       },
-      // 添加权限的表单数据
-      addForm: {
-        name: '',
-        URL: ''
+      editDialogVisible: false,
+      editMenuForm: {
+        id: '',
+        menuName: '',
+        parentName: '',
+        parentId: '',
+        orderNum: '',
+        path: ''
       },
-      // 控制添加用户的显示与隐藏
-      addDialogVisible: false,
-      // 权限列表
-      authoritiesList: [
-        {
-          name: '查看管理员',
-          url: 'admin/showAdmin',
-          note: '无'
-        },
-        {
-          name: '查看课程',
-          url: 'teacher/shoWCourse',
-          note: '无'
-        },
-        {
-          name: '删除管理员',
-          url: 'admin/deleteAdmin',
-          note: '无'
-        }
-      ]
+      editMenuFormRules: {
+        id: [
+          { required: true, message: '请输入权限ID', trigger: 'blur' }
+        ],
+        menuName: [
+          { required: true, message: '请输入权限名', trigger: 'blur' }
+        ],
+        parentId: [
+          { required: true, message: '请输入父权限ID', trigger: 'blur' }
+        ],
+        parentName: [
+          { required: true, message: '请输入父权限名', trigger: 'blur' }
+        ],
+        orderNum: [
+          { required: true, message: '请输入显示顺序', trigger: 'blur' }
+        ],
+        path: [
+          { required: true, message: '请输入URL', trigger: 'blur' }
+        ]
+      }
     }
   },
   created () {
-    // 获取所有的权限
-    this.getAuthoritiesList()
+    this.getMenuList()
   },
   methods: {
-    // 监听添加权限对话框关闭事件
+    async getMenuList () {
+      const { data: res1 } = await this.$http.get('/super/users?username=' + this.username)
+      const { data: res } = await this.$http.get('/userMenuTree/' + res1.result.roleId)
+      if (res.state !== 'success') return this.$message.error('获取权限信息失败')
+      console.log(res.result)
+      this.menuInfo = res.result
+    },
+    addMenu () {
+      // 提交请求前，表单预验证
+      this.$refs.addFormRef.validate(async valid => {
+        // 表单预校验失败
+        if (!valid) return
+        const { data: res } = await this.$http.post('menuAdd', this.addForm)
+        console.log(res)
+        if (res.state !== 'success') {
+          this.$message.error('添加权限失败！')
+          return
+        }
+        this.$message.success('添加权限成功！')
+        // 隐藏添加对话框
+        this.addDialogVisible = false
+      })
+    },
+    // 监听添加用户对话框关闭事件
     addDialogClosed () {
       this.$refs.addFormRef.resetFields()
     },
-    // 获取权限列表
-    async getAuthoritiesList () {
-      const { data: res } = await this.$http.get('authorities/list')
-      if (res.meta.status !== 200) {
-        return this.$message.error('获取权限列表失败')
+    // 删除权限
+    async removeMenuById (id) {
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该权限, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+      // 点击确定 返回值为：confirm
+      // 点击取消 返回值为： cancel
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
       }
-      this.getAuthoritiesList = res.data
+      const { data: res } = await this.$http.delete('menuDelete/' + id)
+      if (res.state !== 'success') return this.$message.error('删除权限失败！')
+      this.$message.success('删除权限成功！')
+    },
+    showEditDialog (id) {
+      this.editMenuForm.id = id
+      this.editDialogVisible = true
+    },
+    editMenu () {
+      // 提交请求前，表单预验证
+      this.$refs.editMenuFormRef.validate(async valid => {
+        // console.log(valid)
+        // 表单预校验失败
+        if (!valid) return
+        const { data: res } = await this.$http.put(
+          'menuEdit',
+          this.editMenuForm
+        )
+        console.log(res)
+        this.editDialogVisible = false
+        if (res.state !== 'success') {
+          return this.$message.error('更新权限信息失败！')
+        }
+        // 隐藏编辑权限对话框
+        this.$message.success('更新权限信息成功！')
+      })
+    },
+    editDialogClosed () {
+      this.$refs.editMenuFormRef.resetFields()
     }
   }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 </style>

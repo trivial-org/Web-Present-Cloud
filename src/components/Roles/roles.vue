@@ -16,11 +16,10 @@
       </el-row>
       <!-- 角色列表 -->
       <el-table :data="rolesList" border stripe>
-        <el-table-column type="expand"></el-table-column>
         <el-table-column label="#" type="index"></el-table-column>
         <el-table-column label="角色名称" prop="roleName"></el-table-column>
         <el-table-column label="角色描述" prop="roleDescription"></el-table-column>
-        <el-table-column label="操作" width="300px">
+        <el-table-column label="操作" width="410px">
           <template slot-scope="scope">
             <el-button
               type="primary"
@@ -40,6 +39,12 @@
               size="mini"
               @click="showSetRightDialog(scope.row)"
             >分配权限</el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-delete"
+              size="mini"
+              @click="showDelRightDialog(scope.row)"
+            >删除权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -101,6 +106,56 @@
         <el-button type="primary" @click="editRoles">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 分配权限对话框 -->
+  <el-dialog
+    title="分配权限"
+    :visible.sync="setRightDialogVisible"
+    width="50%"
+    @close="setRightDialogClosed">
+    <el-tree :data="rightsList" :props="treeProps"     show-checkbox
+    node-key="id" default-expand-all :default-checked-keys="defKeys" ref="treeRef"></el-tree>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="setRightDialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="allotRights">确 定</el-button>
+    </span>
+  </el-dialog>
+
+  <!-- 删除权限对话框 -->
+  <el-dialog
+    title="删除权限"
+    :visible.sync="delRightDialogVisible"
+    width="80%">
+    <template >
+      <el-row :class="['bdbottom', i1 === 0 ? 'bdtop' : '', 'vcenter']" v-for="(item1, i1) in this.roleMenu" :key="item1.id" vcenter>
+        <el-col :span="5">
+          <el-tag closable @close="removeRightById(item1.id)">{{item1.menuName}}</el-tag>
+          <i class="el-icon-caret-right"></i>
+        </el-col>
+        <el-col :span="6">
+          <el-row v-for="(item2, i2) in item1.children" :key="item2.id" :class="[i2 === 0 ? '' : 'bdtop', 'vcenter']" vcenter>
+            <el-col :span="12">
+              <el-tag type="success" closable @close="removeRightById(item2.id)">{{item2.menuName}}</el-tag>
+              <i class="el-icon-caret-right"></i>
+            </el-col>
+            <el-col :span="12">
+              <el-tag
+                type="warning"
+                v-for="(item3) in item2.children"
+                :key="item3.id"
+                closable
+                @close="removeRightById(item3.id)"
+              >{{ item3.menuName}}</el-tag>
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-row>
+    </template>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="delRightDialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="delRightDialogVisible = false">确 定</el-button>
+    </span>
+  </el-dialog>
   </div>
 </template>
 
@@ -118,11 +173,13 @@ export default {
       },
       // 分配权限框
       setRightDialogVisible: false,
+      // 删除权限对话框
+      delRightDialogVisible: false,
       // 权限列表
       rightsList: [],
       //  树形控件的属性绑定对象
       treeProps: {
-        label: 'authName',
+        label: 'menuName',
         children: 'children'
       },
       //   默认选中节点ID值
@@ -163,7 +220,11 @@ export default {
         ]
       },
       //   当前即将分配权限的Id
-      roleId: 0
+      roleId: '',
+      // 取消勾选的id
+      cancelKeys: [],
+      // 角色对应菜单信息
+      roleMenu: []
     }
   },
   created () {
@@ -171,18 +232,16 @@ export default {
   },
   methods: {
     async getRolesList () {
-      console.log('开始获取角色')
       const { data: res } = await this.$http.get('role', {
         params: this.queryInfo
       })
-      console.log(res)
       if (res.state !== 'success') {
         return this.$message.error('获取角色列表失败！')
       }
       this.rolesList = res.result
     },
     // 根据ID删除对应的权限
-    async removeRightById (role, rightId) {
+    async removeRightById (rightId) {
       // 弹框提示 删除
       const confirmResult = await this.$confirm(
         '此操作将永久删除该权限, 是否继续?',
@@ -198,45 +257,72 @@ export default {
       if (confirmResult !== 'confirm') {
         this.$message.info('已取消权限删除')
       }
+      var param = {'roleId': this.roleId, 'menuId': rightId}
       const { data: res } = await this.$http.delete(
-        `roles/${role.id}/rights/${rightId}`
+        '/roleMenuDelete',
+        {data: param}
       )
-      if (res.meta.status !== 200) {
+      if (res.state !== 'success') {
         return this.$message.error('删除权限失败！')
       }
-      this.rolesList = res.data
+      this.rolesList = res.result
       //   不建议使用
       this.getRolesList()
     },
-    // 分配权限
+    // 展示分配权限
     async showSetRightDialog (role) {
       this.roleId = role.id
-      // 获取角色的所有权限
-      const { data: res } = await this.$http.get('rights/tree', {
-        credentials: true
-      })
-      if (res.meta.status !== 200) {
+      // // 获取角色的所有权限
+      const { data: res1 } = await this.$http.get('/menuPageTreeAllByRole/' + role.id)
+      const { data: res } = await this.$http.get('menuTreeAll')
+      if (res.state !== 'success') {
         return this.$message.error('获取权限数据失败！')
       }
-      //   获取权限树
-      this.rightsList = res.data
-      //   console.log(res)
-      //   递归获取三级节点的id
-      this.getLeafkeys(role, this.defKeys)
-
+      // //   获取权限树
+      this.rightsList = res.result
+      // //   递归获取二级节点的id
+      for (var i = 0; i < res1.result.length; i++) {
+        this.getLeafkeys(res1.result[i], this.defKeys)
+      }
+      // this.getLeafkeys(res1.result, this.defKeys)
       this.setRightDialogVisible = true
     },
-    // 通过递归 获取角色下三级权限的 id, 并保存到defKeys数组
+    // 展示删除权限
+    async showDelRightDialog (role) {
+      this.roleId = role.id
+      const { data: res } = await this.$http.get('/roleMenuTree/' + role.id)
+      this.roleMenu = res.result
+      console.log(this.roleMenu)
+      if (res.state !== 'success') {
+        return this.$message.error('获取权限数据失败！')
+      }
+      this.delRightDialogVisible = true
+    },
+    // 通过递归 获取角色下二级权限的 id, 并保存到defKeys数组
     getLeafkeys (node, arr) {
-      // 没有children属性，则是三级节点
-      if (!node.children) {
+      // 没有children属性，则是二级节点
+      if (node.children === undefined || node.children.length === 0) {
         return arr.push(node.id)
       }
       node.children.forEach(item => this.getLeafkeys(item, arr))
     },
     // 权限对话框关闭事件
     setRightDialogClosed () {
-      this.rightsList = []
+      this.defKeys = []
+    },
+    // 点击为角色分配权限
+    async allotRights () {
+      const keys = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ]
+      for (const key of keys) {
+        const { data: res } = await this.$http.post('roleMenuAdd', {'roleId': this.roleId, 'menuId': key})
+        if (res.state !== 'success') return this.$message.error('更新权限失败')
+      }
+      this.$message.success('更新权限成功')
+      this.getRolesList()
+      this.setRightDialogVisible = false
     },
     // 添加角色对话框的关闭
     addRoleDialogClosed () {
@@ -258,7 +344,6 @@ export default {
     // 编辑角色
     async showEditDialog (id) {
       const { data: res } = await this.$http.get('/role?roleId=' + id)
-      console.log(res)
       if (res.state !== 'success') {
         return this.$message.error('查询角色信息失败！')
       }
@@ -273,9 +358,7 @@ export default {
         // console.log(valid)
         // 表单预校验失败
         if (!valid) return
-        console.log(this.editRoleForm)
         const { data: res } = await this.$http.put('role', this.editRoleForm)
-        console.log(res)
         if (res.state !== 'success') {
           this.$message.error('更新角色信息失败！')
         }
@@ -300,7 +383,6 @@ export default {
         return this.$message.info('已取消删除')
       }
       const { data: res } = await this.$http.delete('role?roleId=' + id)
-      console.log(res)
       if (res.state !== 'success') return this.$message.error('删除角色失败！')
       this.$message.success('删除角色成功！')
       this.getRolesList()

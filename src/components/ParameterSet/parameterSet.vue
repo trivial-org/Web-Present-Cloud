@@ -20,7 +20,7 @@
       </el-row>
       <el-table :data="params">
         <el-table-column type="index" label="#" fixed></el-table-column>
-        <el-table-column label="orgId" prop="orgId"></el-table-column>
+        <el-table-column label="orgCode" prop="orgCode"></el-table-column>
         <el-table-column label="paramCode" prop="paramCode"></el-table-column>
         <el-table-column label="paramName" prop="paramName"></el-table-column>
         <el-table-column label="paramDesc" prop="paramDesc"></el-table-column>
@@ -110,7 +110,7 @@ export default {
   data () {
     return {
       queryInfo: {
-        orgCode: '10001',
+        orgCode: '10003',
         // 当前的页数
         page: 1,
         // 当前每页显示多少条数据
@@ -181,6 +181,7 @@ export default {
       if (res.state !== 'success') {
         return this.$message.error('获取参数列表失败')
       }
+      console.log(res)
       this.showUsersList = true
       this.params = res.result
     },

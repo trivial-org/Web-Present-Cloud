@@ -56,7 +56,7 @@
               <!-- 图标 -->
               <i :class="iconsObj[item.id]" style="font-size:18.5px"></i>
               <!-- 文本 -->
-              <span>{{item.authName}}</span>
+              <span>{{item.menuName}}</span>
             </template>
 
             <!-- 二级菜单 -->
@@ -70,7 +70,7 @@
                 <!-- 图标 -->
                 <i class="el-icon-menu"></i>
                 <!-- 文本 -->
-                <span>{{subItem.authName}}</span>
+                <span>{{subItem.menuName}}</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -118,97 +118,7 @@ export default {
       // 用户名
       username: localStorage.getItem('username'),
       // 左侧菜单数据
-      menulist: [
-        {
-          id: 101,
-          authName: '菜单管理',
-          path: 'menus',
-          children: [
-            { id: 1011, authName: '菜单列表', path: 'menus-list', children: [] }
-          ]
-        },
-        {
-          id: 102,
-          authName: '角色管理',
-          path: 'roles',
-          children: [
-            { id: 1021, authName: '角色列表', path: 'roles-list', children: [] }
-          ]
-        },
-        {
-          id: 103,
-          authName: '用户管理',
-          path: 'users',
-          children: [
-            { id: 1031, authName: '用户列表', path: 'users-list', children: [] }
-          ]
-        },
-        {
-          id: 104,
-          authName: '权限管理',
-          path: 'authority',
-          children: [
-            {
-              id: 1041,
-              authName: '权限列表',
-              path: 'authority-list',
-              children: []
-            }
-          ]
-        },
-        {
-          id: 105,
-          authName: '数据字典管理',
-          path: 'data-dict',
-          children: [
-            {
-              id: 1051,
-              authName: '数据字典管理',
-              path: 'data-dict-manage',
-              children: []
-            },
-            {
-              id: 1052,
-              authName: '数据字典录入',
-              path: 'data-dict-input',
-              children: []
-            }
-          ]
-        },
-        {
-          id: 106,
-          authName: '课程管理',
-          path: 'courses',
-          children: [
-            {
-              id: 1061,
-              authName: '课程列表',
-              path: 'courses-list',
-              children: []
-            }
-
-          ]
-        },
-        {
-          id: 107,
-          authName: '参数设置',
-          path: 'parameter-Set',
-          children: [
-            {
-              id: 1071,
-              authName: '参数设置',
-              path: 'parameterSet',
-              children: []
-            }
-          ]
-        },
-        {
-          id: 108,
-          authName: '组织管理',
-          path: 'organization-manage',
-          children: []
-        }
-      ],
+      menulist: [],
       isCollpse: false,
       iconsObj: {
         '101': 'iconfont icon-s-order',
@@ -253,10 +163,19 @@ export default {
   },
   created () {
     this.activePath = window.sessionStorage.getItem('activePath')
+    this.getMenuList()
   },
   methods: {
     goToHome () {
       this.$router.push('/welcome')
+    },
+    async getMenuList () {
+      const { data: res1 } = await this.$http.get('/super/users?username=' + this.username)
+      console.log(res1)
+      const { data: res } = await this.$http.get('/userMenuTree/' + res1.result.roleId)
+      console.log(res)
+      if (res.state !== 'success') return this.$message.error('获取菜单信息失败')
+      this.menulist = res.result
     },
     async logout () {
       const { data: res } = await this.$http.post('/signout', {
@@ -288,7 +207,10 @@ export default {
     async changePswd () {
       this.$refs.pswdFormRef.validate(async valid => {
         if (!valid) return
-        const { data: res } = await this.$http.put('user/password', this.pswdForm)
+        const { data: res } = await this.$http.put(
+          'user/password',
+          this.pswdForm
+        )
         if (res.state !== 'success') {
           return this.$message.error('修改密码失败！')
         }
@@ -312,12 +234,6 @@ export default {
   // },
   //   methods: {
   //     // 获取所有菜单
-  //     async getMenuList () {
-  //       const { data: res } = await this.$http.get('menus')
-  //       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
-  //       this, (menulist = res.data)
-  //       console.log(res)
-  //     }
   //   }
 }
 </script>

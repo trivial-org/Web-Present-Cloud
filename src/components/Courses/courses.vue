@@ -123,113 +123,113 @@
 </template>
 
 <script>
-  export default{
-      data() {
-        return {
-            //获取列表参数对象
-            queryInfo: {
-                query:'',
-                page: 1,
-                pageSize: 10
-            },
-            courselist: [],
-            total: 0,
-            /*控制创建课程对话框的显示与隐藏*/
-            addDialogVisible: false,
-            /*添加用户的表单数据*/
-            addForm: {
-                className: '',
-                teacherName: '',
-                grade: '',
-                teachingMateria:'',
-                school: '',
-                college: '',
-                lessonStartDate: '',
-                lessonEndDate:'',
-                introduction:''
-            },
-            /*添加表单的验证规则对象*/
-            addFormRules:{
-                className: [
-                    {required:true, message:'请输入课程名称', trigger:'blur'},
-                    {min: 1, max: 10, message: '课程名称长度在1-10个',trigger: 'blur'}
-                ]
-            },
-
-        }
+export default{
+  data () {
+    return {
+      // 获取列表参数对象
+      queryInfo: {
+        query: '',
+        page: 1,
+        pageSize: 10
       },
-      created() {
-        this.getCourseList()
+      courselist: [],
+      total: 0,
+      /* 控制创建课程对话框的显示与隐藏 */
+      addDialogVisible: false,
+      /* 添加用户的表单数据 */
+      addForm: {
+        className: '',
+        teacherName: '',
+        grade: '',
+        teachingMateria: '',
+        school: '',
+        college: '',
+        lessonStartDate: '',
+        lessonEndDate: '',
+        introduction: ''
       },
-      methods: {
-          async getCourseList() {
-              const {data: res} = await this.$http.get('/user/createdClass',{
-                  params: this.queryInfo
-              })
-
-              if (res.state !== 'success') {
-                  return this.$message.error('获取课程列表失败')
-              }
-              this.courselist = res.result
-              console.log(res.result)
-              this.total = res.result.length
-          },
-          handleSizeChange(newSize) {
-              console.log(newSize)
-              this.queryInfo.pagesize=newSize
-          },
-          handleCurrentChange(newPage) {
-              console.log(newPage)
-              this.queryInfo.pagenum = newPage
-          },
-          /*监听添加用户对话框的关闭事件*/
-          addDialogClosed() {
-              this.$refs.addFormRef.resetFields()
-          },
-          addCourse() {
-              this.$refs.addFormRef.validate(async valid => {
-                  if(!valid) return
-                  const {data: res} = await this.$http.post('cloudClass',this.addForm)
-                  console.log(res)
-                  if (res.state !== 'success') {
-                      this.$message.error('创建课程失败！')
-                      return
-                  }
-                  this.$message.success('创建课程成功！')
-                  this.addDialogVisible = false
-                  this.getCourseList()
-              })
-          },
-
-          async removeCourseById(orgCode) {
-              const confirmResult = await this.$confirm(
-                  '此操作将永久删除该课程, 是否继续?',
-                  '提示',
-                  {
-                      confirmButtonText: '确定',
-                      cancelButtonText: '取消',
-                      type: 'warning'
-                  }
-              ).catch(err => err)
-              // 点击确定 返回值为：confirm
-              // 点击取消 返回值为： cancel
-              if (confirmResult !== 'confirm') {
-                  return this.$message.info('已取消删除')
-              }
-              const { data: res } = await this.$http.delete('cloudClass?orgCode=' + orgCode)
-              if (res.state !== 'success') return this.$message.error('删除用户失败！')
-              this.$message.success('删除课程成功！')
-              this.getCourseList()
-          },
-          getCourseInfo(orgCode){
-              this.$router.push({
-                  path: '/course-info',
-                  query: { 'orgCode': orgCode}
-              })
-          }
-
+      /* 添加表单的验证规则对象 */
+      addFormRules: {
+        className: [
+          {required: true, message: '请输入课程名称', trigger: 'blur'},
+          {min: 1, max: 10, message: '课程名称长度在1-10个', trigger: 'blur'}
+        ]
       }
+
+    }
+  },
+  created () {
+    this.getCourseList()
+  },
+  methods: {
+    async getCourseList () {
+      const {data: res} = await this.$http.get('/user/createdClass', {
+        params: this.queryInfo
+      })
+
+      if (res.state !== 'success') {
+        return this.$message.error('获取课程列表失败')
+      }
+      this.courselist = res.result
+      console.log(res.result)
+      this.total = res.result.length
+    },
+    handleSizeChange (newSize) {
+      console.log(newSize)
+      this.queryInfo.pagesize = newSize
+    },
+    handleCurrentChange (newPage) {
+      console.log(newPage)
+      this.queryInfo.pagenum = newPage
+    },
+    /* 监听添加用户对话框的关闭事件 */
+    addDialogClosed () {
+      this.$refs.addFormRef.resetFields()
+    },
+    addCourse () {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return
+        const {data: res} = await this.$http.post('cloudClass', this.addForm)
+        console.log(res)
+        if (res.state !== 'success') {
+          this.$message.error('创建课程失败！')
+          return
+        }
+        this.$message.success('创建课程成功！')
+        this.addDialogVisible = false
+        this.getCourseList()
+      })
+    },
+
+    async removeCourseById (orgCode) {
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该课程, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+      // 点击确定 返回值为：confirm
+      // 点击取消 返回值为： cancel
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+      }
+      const { data: res } = await this.$http.delete('cloudClass?orgCode=' + orgCode)
+      if (res.state !== 'success') return this.$message.error('删除用户失败！')
+      this.$message.success('删除课程成功！')
+      this.getCourseList()
+    },
+    getCourseInfo (orgCode) {
+      this.$router.push({
+        path: '/course-info',
+        query: {'orgCode': orgCode}
+      })
+    }
+
   }
+}
 </script>
 
 <style lang="less" scoped>
