@@ -91,6 +91,9 @@
         <el-form-item label="路由地址" prop="path">
           <el-input v-model="addForm.path"></el-input>
         </el-form-item>
+        <el-form-item label="类型" prop="path">
+          <el-input v-model="addForm.path"></el-input>
+        </el-form-item>
       </el-form>
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
@@ -128,8 +131,10 @@
         <el-form-item label="显示顺序" prop="orderNum">
           <el-input v-model="editMenuForm.orderNum"></el-input>
         </el-form-item>
-        <el-form-item label="路由地址" prop="path">
-          <el-input v-model="editMenuForm.path"></el-input>
+        <el-form-item label="路由地址" prop="MType">
+          <el-select v-model="editMenuForm.MType" placeholder="请选择菜单类型" filterable allow-create default-first-option>
+            <el-option v-for="item in menuTypeList" :label="item.value" :value="item.id" :key="item.id"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -145,6 +150,11 @@ export default {
   data () {
     return {
       username: localStorage.getItem('username'),
+      menuTypeList: [
+        {id: 'M', value: '目录'},
+        {id: 'C', value: '菜单'},
+        {id: 'F', value: '按钮'}
+      ],
       menuInfo: [],
       queryInfo: {},
       addDialogVisible: false,
@@ -154,7 +164,8 @@ export default {
         parentName: '',
         parentId: '',
         orderNum: '',
-        path: ''
+        path: '',
+        MType: ''
       },
       addFormRules: {
         id: [

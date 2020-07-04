@@ -290,7 +290,7 @@ export default {
     // 展示删除权限
     async showDelRightDialog (role) {
       this.roleId = role.id
-      const { data: res } = await this.$http.get('/menuPageTreeAllByRole/' + role.id)
+      const { data: res } = await this.$http.get('/roleMenuTree/' + role.id)
       this.roleMenu = res.result
       console.log(this.roleMenu)
       if (res.state !== 'success') {
