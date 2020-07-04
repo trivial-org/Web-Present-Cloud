@@ -13,6 +13,7 @@ import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput
 import parameterSet from '@/components/ParameterSet/parameterSet'
 import Courses from '@/components/Courses/courses.vue'
 import CourseInfo from '@/components/Courses/courseinfo.vue'
+import Members from '@/components/Courses/members.vue'
 import Role from '@/components/Roles/roles'
 import E_403 from '@/pages/error-page/403'
 import E_404 from '@/pages/error-page/404'
@@ -92,6 +93,11 @@ const router = new Router({
           name: 'CourseInfo',
           path: '/course-info',
           component: CourseInfo
+        },
+        {
+          name: 'Members',
+          path: '/members',
+          component: Members
         }
       ]
     },

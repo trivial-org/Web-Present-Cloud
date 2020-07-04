@@ -81,33 +81,78 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="签到" name="activities">
-          <el-table :data="activityTableData" border stripe>
+          <el-table :data="signTableData" border stripe>
             <el-table-column type="index"></el-table-column>
-            <el-table-column label="活动类型" prop="activityTypeId"></el-table-column>
-            <el-table-column label="活动创建时间" prop="beginDate"></el-table-column>
-            <el-table-column label="签到答案" prop="activityParam"></el-table-column>
-            <el-table-column label="签到分数" prop="maxscore"></el-table-column>
+            <el-table-column label="活动id" prop="activityId"></el-table-column>
+            <el-table-column label="签到类型" prop="answerLength" :formatter="signstyleFormat"></el-table-column>
+            <el-table-column label="开始时间" prop="beginDate"></el-table-column>
+            <el-table-column label="状态" prop="isActive" :formatter="stateFormat"></el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template slot-scope="scope">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="详情"
+                  placement="top"
+                  :enterable="false"
+                >
+                  <el-button
+                    type="warning"
+                    icon="el-icon-setting"
+                    size="mini"
+                    circle
+                    @click="getMembersInfo(scope.row.activityId)"
+                  ></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="作业" name="homework">作业</el-tab-pane>
+        <el-tab-pane label="作业" name="homework">
+          <el-table :data="homeworkTableData" border stripe>
+            <el-table-column type="index"></el-table-column>
+            <el-table-column label="活动id" prop="activityId"></el-table-column>
+            <el-table-column label="作业类型" prop="activityTypeId"></el-table-column>
+            <el-table-column label="活动创建时间" prop="beginDate"></el-table-column>
+            <el-table-column label="状态" prop="isActive" :formatter="stateFormat"></el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template slot-scope="scope">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="详情"
+                  placement="top"
+                  :enterable="false"
+                >
+                  <el-button
+                    type="warning"
+                    icon="el-icon-setting"
+                    size="mini"
+                    circle
+                    @click="getMembersInfo(scope.row.activityId)"
+                  ></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
 </template>
 
 <script>
-    import Member from './components/Member.vue'
-    import Activity from './components/Activity.vue'
-    //
+
     export default {
         name: 'Tab',
-        components: { Member, Activity },
+
         data() {
             return {
                 queryInfo: {
                     page: 1,
                     pageSize: 10
                 },
+                i:1,
                 activeName:'information',
                 showInformation:true,
                 showEditInformation:false,
@@ -115,6 +160,8 @@
                 orgCode: 0,
                 memberTableData: [],
                 activityTableData: [],
+                signTableData: [],
+                homeworkTableData: [],
                 informationTableData: {
                     // classCloud:{
                     //     school:'',
@@ -134,10 +181,10 @@
                     ]
                 },
                 createActivityInfo: {
-                    activityTypeId:2,
-                    activityDescription: '第一次作业',
+                    activityTypeId:1,
+                    activityDescription: '第一次签到',
                     maxscore: 4,			//活动分数
-                    orgCode: 10002,
+                    orgCode: 10007,
                 }
             }
 
@@ -148,8 +195,12 @@
         created() {
             this.getParamsData();
             // this.createdActivity()
+
         },
         methods: {
+            getActivityData(){
+
+            },
             handleTabClick() {
                 console.log(this.activeName)
                 this.getParamsData()
@@ -168,12 +219,24 @@
                     console.log(res)
                     this.memberTableData = res.result
                 }else if(this.activeName == 'activities'){
-                    const {data: res} = await this.$http.get(`/activities?orgCode=`+this.orgCode)
+                    const {data: res} = await this.$http.get(`/activities/class/self?orgCode=`+this.orgCode)
                     if(res.state !== 'success'){
                         return this.$message.error('获取活动列表失败')
                     }
                     console.log(res)
-                    this.activityTableData = res.result
+                    if(this.i==1){
+                        for (var i = 0; i < res.result.length; i++) {
+                            if (res.result[i].activityTypeId == 1){
+                                this.signTableData.push(res.result[i])
+                            }else{
+                                this.homeworkTableData.push(res.result[i])
+                            }
+                        }
+                    }
+                    this.i=this.i+1;
+
+
+
                 }else if(this.activeName == 'information'){
                     const {data: res} = await this.$http.get(`/cloudClass?orgCode=`+this.orgCode)
                     if(res.state !== 'success'){
@@ -219,6 +282,26 @@
             editCourseClosed() {
                 this.$refs.informationFormRef.resetFields();
                 this.showEditDialog();
+            },
+            getMembersInfo(activityId) {
+                this.$router.push({
+                    path: '/members',
+                    query: { 'activityId': activityId}
+                })
+            },
+            signstyleFormat(row, column){
+                if (row.answerLength == 0) {
+                    return '手势签到'
+                } else  {
+                    return '一键签到'
+                }
+            },
+            stateFormat(row, column){
+                if (row.answerLength == 1) {
+                    return '进行中'
+                } else  {
+                    return '已结束'
+                }
             }
         }
     }
