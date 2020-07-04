@@ -74,10 +74,9 @@
         <el-tab-pane label="成员" name="members">
           <el-table :data="memberTableData" border stripe>
             <el-table-column type="index"></el-table-column>
-            <el-table-column label="姓名" prop="memberDetail.userClassNickName"></el-table-column>
-            <el-table-column label="学号" prop="memberDetail.userClassNumber"></el-table-column>
-            <el-table-column label="学校" prop="memberDetail.userClassSchool"></el-table-column>
-            <el-table-column label="学院" prop="memberDetail.userClassCollege"></el-table-column>
+            <el-table-column label="姓名" prop="username"></el-table-column>
+            <el-table-column label="学号" prop="studentId"></el-table-column>
+            <el-table-column label="总分" prop="sumScore"></el-table-column>
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="签到" name="activities">
@@ -212,7 +211,7 @@
                 this.orgCode = this.$route.query.orgCode
                 console.log(this.orgCode)
                 if(this.activeName == "members"){
-                    const {data: res} = await this.$http.get(`/cloudClass/members?orgCode=`+this.orgCode,{
+                    const {data: res} = await this.$http.get(`/activities/orgMemberScore?orgCode=`+this.orgCode,{
                         params: this.queryInfo
                     })
                     if(res.state !== 'success'){
