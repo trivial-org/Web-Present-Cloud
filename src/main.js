@@ -18,8 +18,11 @@ axios.defaults.withCredentials = true
 Vue.prototype.$http = axios
 axios.interceptors.request.use(
   config => {
-    if (localStorage.getItem('token')) {
-      config.headers.myAuthorization = localStorage.getItem('token')
+    console.log(config)
+    if (!(config.data && config.data.param)) {
+      if (localStorage.getItem('token')) {
+        config.headers.myAuthorization = localStorage.getItem('token')
+      }
     }
     return config
   },

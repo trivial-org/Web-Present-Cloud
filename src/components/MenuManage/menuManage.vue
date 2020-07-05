@@ -131,7 +131,10 @@
         <el-form-item label="显示顺序" prop="orderNum">
           <el-input v-model="editMenuForm.orderNum"></el-input>
         </el-form-item>
-        <el-form-item label="路由地址" prop="MType">
+        <el-form-item label="路由地址" prop="path">
+          <el-input v-model="editMenuForm.path"></el-input>
+        </el-form-item>
+        <el-form-item label="类型" prop="MType">
           <el-select v-model="editMenuForm.MType" placeholder="请选择菜单类型" filterable allow-create default-first-option>
             <el-option v-for="item in menuTypeList" :label="item.value" :value="item.id" :key="item.id"></el-option>
           </el-select>
@@ -226,7 +229,6 @@ export default {
       const { data: res1 } = await this.$http.get('/super/users?username=' + this.username)
       const { data: res } = await this.$http.get('/userMenuTree/' + res1.result.roleId)
       if (res.state !== 'success') return this.$message.error('获取菜单信息失败')
-      console.log(res.result)
       this.menuInfo = res.result
     },
     addMenu () {
@@ -235,7 +237,6 @@ export default {
         // 表单预校验失败
         if (!valid) return
         const { data: res } = await this.$http.post('menuAdd', this.addForm)
-        console.log(res)
         if (res.state !== 'success') {
           this.$message.error('添加菜单失败！')
           return
@@ -283,7 +284,6 @@ export default {
           'menuEdit',
           this.editMenuForm
         )
-        console.log(res)
         this.editDialogVisible = false
         if (res.state !== 'success') {
           return this.$message.error('更新菜单信息失败！')

@@ -14,6 +14,7 @@ import parameterSet from '@/components/ParameterSet/parameterSet'
 import Courses from '@/components/Courses/courses.vue'
 import CourseInfo from '@/components/Courses/courseinfo.vue'
 import Role from '@/components/Roles/roles'
+import organizationManage from '@/components/OrganizationManage/organizationManage'
 import E_403 from '@/pages/error-page/403'
 import E_404 from '@/pages/error-page/404'
 import E_500 from '@/pages/error-page/500'
@@ -85,13 +86,18 @@ const router = new Router({
         {
           name: 'Courses',
           path: '/courses-list',
-          component: Courses,
+          component: Courses
 
         },
         {
           name: 'CourseInfo',
           path: '/course-info',
           component: CourseInfo
+        },
+        {
+          name: 'organizationManage',
+          path: '/organization_list',
+          component: organizationManage
         }
       ]
     },

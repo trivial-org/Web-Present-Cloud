@@ -54,7 +54,7 @@ export default {
   components: { SocialSign },
   data () {
     return {
-      imgCode: 'http://47.95.120.250:8080/verification/code',
+      imgCode: 'http://47.95.120.250:8081/verification/code',
       // 登录表单数据绑定对象
       loginForm: {
         username: '',
@@ -92,6 +92,7 @@ export default {
     login () {
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
+        this.loginForm.param = true
         const { data: res } = await this.$http.post('signin', this.loginForm)
         if (res.state !== 'success') return this.$message.error(res.msg)
         this.$message.success('登录成功')
@@ -99,7 +100,7 @@ export default {
             1.将登录成功之后的token保存到客户端的sessionStorage中
                 项目中除了登录之外的其他API接口，必须在登录之后才能访问
                 token只应在当前网站打开期间有效，所以将token保存在sessionStorage中
-            2.通过编程式导航跳转到后台主页，路由地址是 /home
+            2.通过编程式导航跳转到后台主页，路由地址是 /welcome
         */
         window.localStorage.setItem('username', this.loginForm.username)
         window.localStorage.setItem('token', res.result.token)

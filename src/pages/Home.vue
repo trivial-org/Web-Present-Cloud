@@ -120,16 +120,17 @@ export default {
       // 左侧菜单数据
       menulist: [],
       isCollpse: false,
-      iconsObj: {
-        '101': 'iconfont icon-s-order',
-        '102': 'iconfont icon-postcard',
-        '103': 'iconfont icon-user-solid',
-        '104': 'iconfont icon-s-tools',
-        '105': 'iconfont icon-data-analysis',
-        '106': 'iconfont icon-s-management',
-        '107': 'iconfont icon-set-up',
-        '108': 'iconfont icon-cherry'
-      },
+      // iconsObj: {
+      //   '101': 'iconfont icon-s-order',
+      //   '102': 'iconfont icon-postcard',
+      //   '103': 'iconfont icon-user-solid',
+      //   '104': 'iconfont icon-s-tools',
+      //   '105': 'iconfont icon-data-analysis',
+      //   '106': 'iconfont icon-s-management',
+      //   '107': 'iconfont icon-set-up',
+      //   '108': 'iconfont icon-cherry'
+      // },
+      iconsObj: {},
       // 被激活的链接地址
       activePath: '',
       // 修改密码表单
@@ -171,11 +172,13 @@ export default {
     },
     async getMenuList () {
       const { data: res1 } = await this.$http.get('/super/users?username=' + this.username)
-      console.log(res1)
-      const { data: res } = await this.$http.get('/userMenuTree/' + res1.result.roleId)
+      const { data: res } = await this.$http.get('/roleMenuTree/' + res1.result.roleId)
       console.log(res)
       if (res.state !== 'success') return this.$message.error('获取菜单信息失败')
       this.menulist = res.result
+      for (var i = 0; i < this.menulist.length; i++) {
+        this.iconsObj[this.menulist[i].id] = this.menulist[i].icon
+      }
     },
     async logout () {
       const { data: res } = await this.$http.post('/signout', {
