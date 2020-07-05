@@ -74,151 +74,239 @@
         <el-tab-pane label="成员" name="members">
           <el-table :data="memberTableData" border stripe>
             <el-table-column type="index"></el-table-column>
-            <el-table-column label="姓名" prop="memberDetail.userClassNickName"></el-table-column>
-            <el-table-column label="学号" prop="memberDetail.userClassNumber"></el-table-column>
-            <el-table-column label="学校" prop="memberDetail.userClassSchool"></el-table-column>
-            <el-table-column label="学院" prop="memberDetail.userClassCollege"></el-table-column>
+            <el-table-column label="姓名" prop="username"></el-table-column>
+            <el-table-column label="学号" prop="studentId"></el-table-column>
+            <el-table-column label="总分" prop="sumScore"></el-table-column>
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="签到" name="activities">
-          <el-table :data="activityTableData" border stripe>
+          <el-table :data="signTableData" border stripe>
             <el-table-column type="index"></el-table-column>
-            <el-table-column label="活动类型" prop="activityTypeId"></el-table-column>
-            <el-table-column label="活动创建时间" prop="beginDate"></el-table-column>
-            <el-table-column label="签到答案" prop="activityParam"></el-table-column>
-            <el-table-column label="签到分数" prop="maxscore"></el-table-column>
+            <el-table-column label="活动id" prop="activityId"></el-table-column>
+            <el-table-column label="签到类型" prop="answerLength" :formatter="signstyleFormat"></el-table-column>
+            <el-table-column label="签到开始时间" prop="beginDate"></el-table-column>
+            <el-table-column label="签到结束时间" prop="endDate"></el-table-column>
+            <el-table-column label="状态" prop="isActive" :formatter="stateFormat"></el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template slot-scope="scope">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="查看参与详情"
+                  placement="top"
+                  :enterable="false"
+                >
+                  <el-button
+                    type="warning"
+                    icon="el-icon-setting"
+                    size="mini"
+                    circle
+                    @click="getMembersInfo(scope.row.activityId)"
+                  ></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="作业" name="homework">作业</el-tab-pane>
+        <el-tab-pane label="作业" name="homework">
+          <el-table :data="homeworkTableData" border stripe>
+            <el-table-column type="index"></el-table-column>
+            <el-table-column label="活动id" prop="activityId"></el-table-column>
+            <el-table-column label="作业名称" prop="activityName"></el-table-column>
+            <el-table-column label="活动开始时间" prop="beginDate"></el-table-column>
+            <el-table-column label="活动结束时间" prop="endDate"></el-table-column>
+            <el-table-column label="状态" prop="isActive" :formatter="stateFormat"></el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template slot-scope="scope">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="查看参与详情"
+                  placement="top"
+                  :enterable="false"
+                >
+                  <el-button
+                    type="warning"
+                    icon="el-icon-setting"
+                    size="mini"
+                    circle
+                    @click="getMembersInfo(scope.row.activityId)"
+                  ></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
 </template>
 
 <script>
-import Member from './components/Member.vue'
-import Activity from './components/Activity.vue'
-//
-export default {
-  name: 'Tab',
-  components: { Member, Activity },
-  data () {
-    return {
-      queryInfo: {
-        page: 1,
-        pageSize: 10
-      },
-      activeName: 'information',
-      showInformation: true,
-      showEditInformation: false,
-      // 课程id
-      orgCode: 0,
-      memberTableData: [],
-      activityTableData: [],
-      informationTableData: {
-        // classCloud:{
-        //     school:'',
-        //     college:'',
-        //     className:'',
-        //     grade:'',
-        //     teachingMateria:'',
-        //     lessonStartDate:'',
-        //     lessonEndDate:'',
-        //     introduction:''
-        // }
-      },
-      informationFormRules: {
-        className: [
-          {required: true, message: '请输入课程名称', trigger: 'blur'},
-          {min: 1, max: 15, message: '课程名称长度在1-10个', trigger: 'blur'}
-        ]
-      },
-      createActivityInfo: {
-        activityTypeId: 2,
-        activityDescription: '第一次作业',
-        maxscore: 4, // 活动分数
-        orgCode: 10002
-      }
+
+    export default {
+        name: 'Tab',
+
+        data() {
+            return {
+                queryInfo: {
+                    page: 1,
+                    pageSize: 10
+                },
+                i:1,
+                activeName:'information',
+                showInformation:true,
+                showEditInformation:false,
+                //课程id
+                orgCode: 0,
+                memberTableData: [],
+                activityTableData: [],
+                signTableData: [],
+                homeworkTableData: [],
+                informationTableData: {
+                    // classCloud:{
+                    //     school:'',
+                    //     college:'',
+                    //     className:'',
+                    //     grade:'',
+                    //     teachingMateria:'',
+                    //     lessonStartDate:'',
+                    //     lessonEndDate:'',
+                    //     introduction:''
+                    // }
+                },
+                informationFormRules:{
+                    className: [
+                        {required:true, message:'请输入课程名称', trigger:'blur'},
+                        {min: 1, max: 15, message: '课程名称长度在1-10个',trigger: 'blur'}
+                    ]
+                },
+                createActivityInfo: {
+                    activityTypeId:1,
+                    activityDescription: '第一次签到',
+                    maxscore: 4,			//活动分数
+                    orgCode: 10007,
+                }
+            }
+
+        },
+        watch: {
+
+        },
+        created() {
+            this.getParamsData();
+            // this.createdActivity()
+
+        },
+        methods: {
+            getActivityData(){
+
+            },
+            handleTabClick() {
+                console.log(this.activeName)
+                this.getParamsData()
+            },
+            //获取参数的列表数据
+            async getParamsData() {
+                this.orgCode = this.$route.query.orgCode
+                console.log(this.orgCode)
+                if(this.activeName == "members"){
+                    const {data: res} = await this.$http.get(`/activities/orgMemberScore?orgCode=`+this.orgCode,{
+                        params: this.queryInfo
+                    })
+                    if(res.state !== 'success'){
+                        return this.$message.error('获取成员列表失败')
+                    }
+                    console.log(res)
+                    this.memberTableData = res.result
+                }else if(this.activeName == 'activities'){
+                    const {data: res} = await this.$http.get(`/activities/class/self?orgCode=`+this.orgCode)
+                    if(res.state !== 'success'){
+                        return this.$message.error('获取活动列表失败')
+                    }
+                    console.log(res)
+                    if(this.i==1){
+                        for (var i = 0; i < res.result.length; i++) {
+                            if (res.result[i].activityTypeId == 1){
+                                this.signTableData.push(res.result[i])
+                            }else{
+                                this.homeworkTableData.push(res.result[i])
+                            }
+                        }
+                    }
+                    this.i=this.i+1;
+
+
+
+                }else if(this.activeName == 'information'){
+                    const {data: res} = await this.$http.get(`/cloudClass?orgCode=`+this.orgCode)
+                    if(res.state !== 'success'){
+                        return this.$message.error('获取课程详情列表失败')
+                    }
+                    this.informationTableData = res.result.classCloud
+                    // this.orgCode =
+                    console.log(this.informationTableData)
+                }
+
+            },
+            async createdActivity() {
+                const {data: res} = await this.$http.post('/activities',this.createActivityInfo)
+                if(res.state !== 'success'){
+                    return this.$message.error('创建活动失败')
+                }
+                console.log(res)
+                this.memberTableData = res.result
+            },
+            showEditDialog() {
+                this.showInformation = !this.showInformation;
+                this.showEditInformation = !this.showEditInformation;
+            },
+
+            editCourse() {
+                this.$refs.informationFormRef.validate(async valid =>
+                {
+                    if(!valid) return
+                    const { data: res } = await this.$http.put(
+                        'cloudClass?orgCode='+this.orgCode,
+                        this.informationTableData
+                    )
+                    if (res.state !== 'success') {
+                        this.$message.error('更新课程信息失败！')
+                    }
+
+                    this.showEditDialog();
+                    this.getParamsData();
+                    // this.getCourseList()
+                    this.$message.success("更新课程信息成功")
+                })
+            },
+            editCourseClosed() {
+                this.$refs.informationFormRef.resetFields();
+                this.showEditDialog();
+            },
+            getMembersInfo(activityId) {
+                this.$router.push({
+                    path: '/members',
+                    query: { 'activityId': activityId}
+                })
+            },
+            signstyleFormat(row, column){
+                if (row.answerLength == 0) {
+                    return '手势签到'
+                } else  {
+                    return '一键签到'
+                }
+            },
+            stateFormat(row, column){
+                if (row.answerLength == 1) {
+                    return '进行中'
+                } else  {
+                    return '已结束'
+                }
+            }
+        }
     }
-  },
-  watch: {
-
-  },
-  created () {
-    this.getParamsData()
-    // this.createdActivity()
-  },
-  methods: {
-    handleTabClick () {
-      console.log(this.activeName)
-      this.getParamsData()
-    },
-    // 获取参数的列表数据
-    async getParamsData () {
-      this.orgCode = this.$route.query.orgCode
-      if (this.activeName === 'members') {
-        const {data: res} = await this.$http.get(`/cloudClass/members?orgCode=` + this.orgCode, {
-          params: this.queryInfo
-        })
-        if (res.state !== 'success') {
-          return this.$message.error('获取成员列表失败')
-        }
-        console.log(res)
-        this.memberTableData = res.result
-      } else if (this.activeName === 'activities') {
-        const {data: res} = await this.$http.get(`/activities?orgCode=` + this.orgCode)
-        if (res.state !== 'success') {
-          return this.$message.error('获取活动列表失败')
-        }
-        console.log(res)
-        this.activityTableData = res.result
-      } else if (this.activeName === 'information') {
-        const {data: res} = await this.$http.get(`/cloudClass?orgCode=` + this.orgCode)
-        if (res.state !== 'success') {
-          return this.$message.error('获取课程详情列表失败')
-        }
-        this.informationTableData = res.result.classCloud
-        // this.orgCode =
-        console.log(this.informationTableData)
-      }
-    },
-    async createdActivity () {
-      const {data: res} = await this.$http.post('/activities', this.createActivityInfo)
-      if (res.state !== 'success') {
-        return this.$message.error('创建活动失败')
-      }
-      console.log(res)
-      this.memberTableData = res.result
-    },
-    showEditDialog () {
-      this.showInformation = !this.showInformation
-      this.showEditInformation = !this.showEditInformation
-    },
-
-    editCourse () {
-      this.$refs.informationFormRef.validate(async valid => {
-        if (!valid) return
-        const { data: res } = await this.$http.put(
-          'cloudClass?orgCode=' + this.orgCode,
-          this.informationTableData
-        )
-        if (res.state !== 'success') {
-          this.$message.error('更新课程信息失败！')
-        }
-
-        this.showEditDialog()
-        this.getParamsData()
-        // this.getCourseList()
-        this.$message.success('更新课程信息成功')
-      })
-    },
-    editCourseClosed () {
-      this.$refs.informationFormRef.resetFields()
-      this.showEditDialog()
-    }
-  }
-}
-</script>
+</script>s
 
 <style scoped>
 .icon-edit{
@@ -226,3 +314,4 @@ export default {
   margin-right: 40px;
 }
 </style>
+

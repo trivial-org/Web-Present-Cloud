@@ -88,28 +88,28 @@
         <el-form-item label="年级" prop="grade">
           <el-input v-model="addForm.grade"></el-input>
         </el-form-item>
-        <el-form-item label="教材">
+        <el-form-item label="教材" prop="teachingMateria">
           <el-input v-model="addForm.teachingMateria"></el-input>
         </el-form-item>
-        <el-form-item label="学校">
+        <el-form-item label="学校" prop="school">
           <el-input v-model="addForm.school"></el-input>
         </el-form-item>
-        <el-form-item label="专业">
+        <el-form-item label="专业" prop="college">
           <el-input v-model="addForm.college"></el-input>
         </el-form-item>
-        <el-form-item label="开课时间">
+        <el-form-item label="开课时间" prop="lessonStartDate">
           <el-col :span="11">
             <el-date-picker type="date" placeholder="选择日期" v-model="addForm.lessonStartDate" style="width: 100%;"></el-date-picker>
           </el-col>
 <!--          <el-input v-model="addForm.lessonStartDate"></el-input>-->
         </el-form-item>
-        <el-form-item label="结课时间">
+        <el-form-item label="结课时间" prop="lessonEndDate">
           <el-col :span="11">
             <el-date-picker type="date" placeholder="选择日期" v-model="addForm.lessonEndDate" style="width: 100%;"></el-date-picker>
           </el-col>
 <!--          <el-input v-model="addForm.lessonEndDate"></el-input>-->
         </el-form-item>
-        <el-form-item label="介绍" >
+        <el-form-item label="介绍" prop="introduction">
           <el-input v-model="addForm.introduction"></el-input>
         </el-form-item>
       </el-form>

@@ -13,6 +13,7 @@ import dataDictionaryInput from '@/components/DataDictionary/dataDictionaryInput
 import parameterSet from '@/components/ParameterSet/parameterSet'
 import Courses from '@/components/Courses/courses.vue'
 import CourseInfo from '@/components/Courses/courseinfo.vue'
+import Members from '@/components/Courses/members.vue'
 import Role from '@/components/Roles/roles'
 import organizationManage from '@/components/OrganizationManage/organizationManage'
 import E_403 from '@/pages/error-page/403'
