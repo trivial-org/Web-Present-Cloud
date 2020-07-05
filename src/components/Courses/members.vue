@@ -19,30 +19,30 @@
 </template>
 
 <script>
-    export default {
-        name: "Members",
-        data() {
-            return {
-                activityId:'',
-                memberlist: []
-            }
-        },
-        created() {
-            this.getMemberList()
-        },
-        methods:{
-            async getMemberList() {
-                this.activityId = this.$route.query.activityId
-                console.log(this.activityId)
-                const {data: res} = await this.$http.get(`/activities/orgParState?activityId=`+this.activityId)
-                if(res.state !== 'success'){
-                    return this.$message.error('获取成员列表失败')
-                }
-                console.log(res)
-                this.memberlist = res.result
-            }
-        }
+export default {
+  name: 'Members',
+  data () {
+    return {
+      activityId: '',
+      memberlist: []
     }
+  },
+  created () {
+    this.getMemberList()
+  },
+  methods: {
+    async getMemberList () {
+      this.activityId = this.$route.query.activityId
+      console.log(this.activityId)
+      const {data: res} = await this.$http.get(`/activities/orgParState?activityId=` + this.activityId)
+      if (res.state !== 'success') {
+        return this.$message.error('获取成员列表失败')
+      }
+      console.log(res)
+      this.memberlist = res.result
+    }
+  }
+}
 </script>
 
 <style scoped>
