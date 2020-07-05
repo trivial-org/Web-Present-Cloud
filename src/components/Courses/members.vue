@@ -20,7 +20,6 @@
 
 <script>
     export default {
-        name: "Members",
         data() {
             return {
                 activityId:'',
