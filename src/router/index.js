@@ -96,6 +96,11 @@ const router = new Router({
           component: CourseInfo
         },
         {
+          name: 'Members',
+          path: '/members',
+          component: Members
+        },
+        {
           name: 'organizationManage',
           path: '/organization_list',
           component: organizationManage

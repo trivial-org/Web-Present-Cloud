@@ -84,6 +84,9 @@ export default {
       // }
     }
   },
+  created () {
+    this.changeCode()
+  },
   methods: {
     changeCode () {
       var num = Math.ceil(Math.random() * 10)
