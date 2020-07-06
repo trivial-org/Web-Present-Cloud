@@ -1,6 +1,6 @@
 <template>
   <div class="login_container">
-    <div class="text">到云登录系统</div>
+    <div class="text">到云后台管理系统系统</div>
     <div class="login_box">
       <div class="avatar_box">
         <img src="../assets/logo.jpg" alt />
